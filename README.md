@@ -1,16 +1,40 @@
-# deni_hackathon
+# DENI HACKATHON
 
-A new Flutter project.
+## Prerequisites
 
-## Getting Started
+Before starting, make sure you have Flutter and the required dependencies installed.
 
-This project is a starting point for a Flutter application.
+### 1. Download Flutter
+Download and install Flutter version **3.29** from the official Flutter website:
+[Flutter Download](https://flutter.dev/docs/get-started/install)
 
-A few resources to get you started if this is your first Flutter project:
+### 2. Check System Requirements
+After installing Flutter, open a terminal and run the following command to check for any missing dependencies:
+```sh
+flutter doctor -v
+```
+This will display the required dependencies. Follow the instructions to install any missing components.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### 3. Install Android Studio
+- Download and install **Android Studio Meerkat** from:
+  [Android Studio Download](https://developer.android.com/studio)
+- Open Android Studio and install the necessary SDK tools, including:
+  - Android SDK
+  - Android SDK Command-line Tools
+  - Android Virtual Device (AVD) (optional for testing on an emulator)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Running the Flutter App
+Once all dependencies are installed, navigate to the project directory and run the following commands:
+
+### 1. Get Dependencies
+```sh
+flutter pub get
+```
+
+### 2. Run the Application
+To run the app on a connected device or emulator, use:
+```sh
+flutter run
+```
+
+

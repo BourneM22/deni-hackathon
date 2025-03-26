@@ -11,9 +11,10 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace api.Services
 {
-    interface IJwtService
+    public interface IJwtService
     {
-        String GenerateToken(String UserId);
+        String generateToken(String UserId);
+        String getUserIdFromToken(string token);
     }
     public class JwtService : IJwtService
     {
@@ -24,7 +25,7 @@ namespace api.Services
             _configuration = configuration;
             _jwtConfig = jwtConfig.Value;
         }
-        public String GenerateToken(String UserId)
+        public String generateToken(String UserId)
         {
             DateTime tokenExpiredTime = DateTime.UtcNow.AddMinutes(_jwtConfig.TokenValidityMins);
 
@@ -46,6 +47,37 @@ namespace api.Services
             var accessToken = tokenHandler.WriteToken(securityToken);
 
             return accessToken;
+        }
+
+        public string? getUserIdFromToken(string token)
+        {
+            if (string.IsNullOrEmpty(token))
+            {
+                return null;
+            }
+
+            var handler = new JwtSecurityTokenHandler();
+
+            try
+            {
+                // Decode the token without validating its signature (just parsing the token)
+                var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+
+                if (jsonToken == null)
+                    return null;  // Invalid token format
+
+                // Validate the token's signature and claims here, if necessary
+                // You can validate the token using the Issuer, Audience, and the SigningKey
+
+                // Retrieve the user ID from the "Name" claim (which you set in your GenerateToken function)
+                var userId = jsonToken?.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Name)?.Value;
+
+                return userId;  // Return the user ID or null if not found
+            }
+            catch (Exception)
+            {
+                return null;  // Token is invalid or parsing failed
+            }
         }
     }
 }

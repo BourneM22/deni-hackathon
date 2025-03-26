@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using api.DTO;
 using api.Models;
 using api.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -23,11 +24,26 @@ namespace api.Controllers
             _passwordHasher = passwordHasher;
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> GetAllUser()
+        public async Task<IActionResult> login([FromBody] LoginRequest request)
         {
-            return Ok(await _authService.GetAllUsers());
+            try
+            {
+                LoginResponse response = await _authService.authenticate(request);
+
+                return Ok(response);
+            }
+            catch (Exception e)
+            {
+                if (e is EmailNotFoundException)
+                {
+                    return BadRequest("Email doesn't exist!");
+                } else
+                {
+                    return Unauthorized("Email and password doesn't match!");
+                }
+            }
         }
 
         [HttpGet]

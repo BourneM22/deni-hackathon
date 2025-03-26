@@ -14,15 +14,15 @@ namespace api.Models
         {
             _mySql = mySql.Value;
         }
-        private String ConnectionStringBuilder(DbModel dbModel)
+        private String ConnectionStringBuilder(DbConfig dbConfig)
         {
             MySqlConnectionStringBuilder connBuilder = new MySqlConnectionStringBuilder()
             {
-                Server = dbModel.Server,
-                Database = dbModel.Database,
-                UserID = dbModel.Uid,
-                Password = dbModel.Password,
-                Port = (uint)dbModel.Port,
+                Server = dbConfig.Server,
+                Database = dbConfig.Database,
+                UserID = dbConfig.Uid,
+                Password = dbConfig.Password,
+                Port = (uint)dbConfig.Port,
                 SslMode = MySqlSslMode.Disabled,
             };
 

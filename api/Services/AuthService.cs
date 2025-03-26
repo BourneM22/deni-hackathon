@@ -1,52 +1,75 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
+using api.DTO;
 using api.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
 namespace api.Services
 {
     public interface IAuthService
     {
-        Task<List<User>> GetAllUsers();
+        Task<LoginResponse> authenticate(LoginRequest request);
     }
+
     public class AuthService : IAuthService
     {
         private readonly DbConnection _dbConnection;
-        public AuthService(DbConnection dbConnection)
+        private readonly IPasswordHasher _passwordHasher;
+        private readonly IJwtService _jwtService;
+        private readonly JwtConfig _jwtConfig;
+
+        public AuthService(DbConnection dbConnection, IPasswordHasher passwordHasher, IJwtService jwtService, IOptions<JwtConfig> jwtConfig)
         {
             _dbConnection = dbConnection;
+            _passwordHasher = passwordHasher;
+            _jwtService = jwtService;
+            _jwtConfig = jwtConfig.Value;
         }
-        public async Task<List<User>> GetAllUsers()
+
+        public async Task<LoginResponse> authenticate(LoginRequest request)
         {
-            List<User> users = new List<User>();
+            String hashedPassword = String.Empty;
+            String userId = String.Empty;
 
-            String query = "select user_id, name, gender, birth_date, email, password, profile_picture_path, created_date_time " +
-                "from User;";
+            String query = "select user_id, password " +
+                "from USER " +
+                "where email = ?;";
 
-            using var conn = _dbConnection.GetConnection();
-            using var cmd = new MySqlCommand(query, conn);
+            using MySqlConnection conn = _dbConnection.GetConnection();
+            using MySqlCommand cmd = new MySqlCommand(query, conn);
+
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = request.Email });
+
             using var reader = await cmd.ExecuteReaderAsync();
 
-            while (await reader.ReadAsync())
+            if (await reader.ReadAsync())
             {
-                User user = new User()
-                {
-                    UserId = reader["USER_ID"].ToString()!,
-                    Name = reader["NAME"].ToString()!,
-                    Gender = Char.Parse(reader["GENDER"].ToString()!.Substring(0, 1)),
-                    BirthDate = DateOnly.FromDateTime(DateTime.Parse(reader["BIRTH_DATE"].ToString()!)),
-                    Email = reader["EMAIL"].ToString()!,
-                    Password = reader["PASSWORD"].ToString()!,
-                    ProfilePicturePath = reader["PROFILE_PICTURE_PATH"].ToString()!,
-                    CreatedDateTime = DateTime.Parse(reader["CREATED_DATE_TIME"].ToString()!),
-                };
-
-                users.Add(user);
+                hashedPassword = reader["PASSWORD"].ToString()!;
+                userId = reader["USER_ID"].ToString()!;
             }
 
-            return users;
+            if (String.IsNullOrEmpty(hashedPassword) || String.IsNullOrEmpty(userId))
+            {
+                throw new EmailNotFoundException();
+            }
+
+            if (!_passwordHasher.verify(hashedPassword, request.Password))
+            {
+                throw new PasswordNotMatchException();
+            }
+
+            return new LoginResponse()
+            {
+                TokenType = "Bearer",
+                AccessToken = _jwtService.generateToken(userId),
+                ExpiresIn = _jwtConfig.TokenValidityMins
+            };
         }
     }
 }

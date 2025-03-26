@@ -10,6 +10,6 @@ namespace api.Models
         public String Issuer { get; set; } = String.Empty;
         public String Audience { get; set; } = String.Empty;
         public String Key { get; set; } = String.Empty;
-        public int TokenValidityMins { get; set; }
+        public long TokenValidityMins { get; set; }
     }
 }

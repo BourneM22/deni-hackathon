@@ -32,8 +32,6 @@ D:\Coding\deni-hackathon\api\obj\Debug\net9.0\refint\api.dll
 D:\Coding\deni-hackathon\api\obj\Debug\net9.0\api.pdb
 D:\Coding\deni-hackathon\api\obj\Debug\net9.0\api.genruntimeconfig.cache
 D:\Coding\deni-hackathon\api\obj\Debug\net9.0\ref\api.dll
-D:\Coding\deni-hackathon\api\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger.dll
-D:\Coding\deni-hackathon\api\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
 D:\Coding\deni-hackathon\api\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll
 D:\Coding\deni-hackathon\api\bin\Debug\net9.0\BouncyCastle.Cryptography.dll
 D:\Coding\deni-hackathon\api\bin\Debug\net9.0\Google.Protobuf.dll
@@ -60,3 +58,16 @@ D:\Coding\deni-hackathon\api\bin\Debug\net9.0\Microsoft.IdentityModel.Protocols.
 D:\Coding\deni-hackathon\api\bin\Debug\net9.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 D:\Coding\deni-hackathon\api\bin\Debug\net9.0\Microsoft.IdentityModel.Tokens.dll
 D:\Coding\deni-hackathon\api\bin\Debug\net9.0\System.IdentityModel.Tokens.Jwt.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\Namotion.Reflection.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\Newtonsoft.Json.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\NJsonSchema.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\NJsonSchema.Annotations.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\NJsonSchema.NewtonsoftJson.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\NJsonSchema.Yaml.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\NSwag.Annotations.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\NSwag.AspNetCore.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\NSwag.Core.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\NSwag.Core.Yaml.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\NSwag.Generation.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\NSwag.Generation.AspNetCore.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\YamlDotNet.dll

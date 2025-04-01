@@ -1,6 +1,7 @@
+import 'package:deni_hackathon/screens/auth/welcome/welcome_controller.dart';
 import 'package:flutter/material.dart';
 
-import 'screens/auth/login/login_screen.dart';
+import 'screens/auth/welcome/welcome_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const LoginScreen(),
+      home: const WelcomeScreen(),
     );
   }
 }

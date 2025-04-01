@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 
-class LoginController extends GetxController {
+class ForgotPasswordController extends GetxController {
 
   final nameTFController = TextEditingController();
   final emailTFController = TextEditingController();

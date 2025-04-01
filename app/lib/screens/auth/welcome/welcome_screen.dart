@@ -1,18 +1,20 @@
 import 'package:deni_hackathon/constants/assets_constants.dart';
 import 'package:deni_hackathon/constants/colors_constants.dart';
-import 'package:deni_hackathon/screens/auth/login/login_controller.dart';
+import 'package:deni_hackathon/screens/auth/welcome/welcome_controller.dart';
 import 'package:deni_hackathon/widgets/deni_style.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+import '../register/register_dialog.dart';
+
+class WelcomeScreen extends StatelessWidget {
+  const WelcomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<LoginController>(
-        init: LoginController(),
-        builder: (LoginController controller) {
+    return GetBuilder<WelcomeController>(
+        init: WelcomeController(),
+        builder: (WelcomeController controller) {
           return Scaffold(
             body: Stack(
               fit: StackFit.expand,
@@ -81,7 +83,37 @@ class LoginScreen extends StatelessWidget {
                         icon: Icon(Icons.email, color: Colors.black),
                         label: Text('Register / Login with Email'),
                         onPressed: () {
-                          _handleEmailLogin(context);
+                          showGeneralDialog(
+                            context: context,
+                            barrierDismissible: true,
+                            barrierLabel: MaterialLocalizations.of(context)
+                                .modalBarrierDismissLabel,
+                            barrierColor:
+                                Colors.black54,
+                            transitionDuration: const Duration(
+                                milliseconds: 300),
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) {
+                              return RegisterDialog();
+                            },
+                            transitionBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              const begin =
+                                  Offset(0.0, 1.0);
+                              const end =
+                                  Offset(0.0, 0.0);
+                              const curve = Curves.easeInOut;
+
+                              var tween = Tween(begin: begin, end: end)
+                                  .chain(CurveTween(curve: curve));
+                              var offsetAnimation = animation.drive(tween);
+
+                              return SlideTransition(
+                                position: offsetAnimation,
+                                child: child,
+                              );
+                            },
+                          );
                         },
                       ),
                       SizedBox(height: 20),
@@ -100,10 +132,9 @@ class LoginScreen extends StatelessWidget {
                               'Terms & Conditions, Privacy Policy, and Disclaimer.',
                               textAlign: TextAlign.center,
                               style: deniStyle(
-                                color: ColorsConstants.trueWhiteColor,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold
-                              ),
+                                  color: ColorsConstants.trueWhiteColor,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold),
                             )
                           ],
                         ),

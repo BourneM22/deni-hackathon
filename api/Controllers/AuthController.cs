@@ -1,13 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using api.DTO;
-using api.Models;
+using api.Exceptions;
 using api.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 namespace api.Controllers
 {
@@ -26,11 +20,11 @@ namespace api.Controllers
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
             try
             {
-                LoginResponse response = await _authService.authenticate(request);
+                LoginResponse response = await _authService.Authenticate(request);
 
                 return Ok(response);
             }
@@ -46,12 +40,18 @@ namespace api.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("[action]")]
-        public IActionResult CheckPassword()
+        public async Task<IActionResult> Register([FromBody] RegisterRequest registerRequest)
         {
-            String hashed = _passwordHasher.hash("halo");
-            return Ok(new { valid = _passwordHasher.verify(hashed, "halo"), HashRes = hashed });
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            await _authService.Register(registerRequest);
+
+            return Ok();
         }
     }
 }

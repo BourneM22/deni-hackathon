@@ -8,8 +8,8 @@ namespace api.Services
 {
     public interface IPasswordHasher
     {
-        String hash(String password);
-        Boolean verify(String hashedPassword, String attemptPassword);
+        String Hash(String password);
+        Boolean Verify(String hashedPassword, String attemptPassword);
     }
     public class PasswordHasher : IPasswordHasher
     {
@@ -19,7 +19,7 @@ namespace api.Services
 
         private static readonly HashAlgorithmName Algorithm = HashAlgorithmName.SHA512;
 
-        public String hash(String password)
+        public String Hash(String password)
         {
             byte[] salt = RandomNumberGenerator.GetBytes(SaltSize);
             byte[] hash = Rfc2898DeriveBytes.Pbkdf2(password, salt, Iterations, Algorithm, HashSize);
@@ -27,7 +27,7 @@ namespace api.Services
             return $"{Convert.ToHexString(hash)}-{Convert.ToHexString(salt)}";
         }
 
-        public Boolean verify(string hashedPassword, string attemptPassword)
+        public Boolean Verify(string hashedPassword, string attemptPassword)
         {
             String[] parts = hashedPassword.Split("-");
             byte[] hash = Convert.FromHexString(parts[0]);

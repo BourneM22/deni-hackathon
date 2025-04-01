@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using api.DTO;
 using api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,26 +12,47 @@ namespace api.Controllers
     {
         private readonly IUserService _userService;
         private readonly IJwtService _jwtService;
+        private readonly IFileService _fileService;
 
-        public UserController(IUserService userService, IJwtService jwtService)
+        public UserController(IUserService userService, IJwtService jwtService, IFileService fileService)
         {
             _userService = userService;
             _jwtService = jwtService;
+            _fileService = fileService;
         }
 
         [HttpGet]
         [Route("[action]")]
-        public async Task<IActionResult> GetAllUser()
+        public async Task<IActionResult> GetUserInfo()
         {
-            return Ok(await _userService.GetAllUsers());
+            String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
+            String userId = _jwtService.GetUserIdFromToken(token);
+            return Ok(await _userService.GetUserInfo(userId));
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("[action]")]
-        public IActionResult CheckId()
+        public async Task<IActionResult> UpdateUserInfo([FromBody] RegisterRequest registerRequest)
         {
-            var token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
-            return Ok(_jwtService.getUserIdFromToken(token!));
+            String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
+            String userId = _jwtService.GetUserIdFromToken(token);
+
+            await _userService.UpdateUserInfo(registerRequest, userId);
+
+            return Ok();
+        }
+
+        [HttpPut]
+        [Route("[action]")]
+        public async Task<IActionResult> UpdateUserProfilePicture(IFormFile profilePicture)
+        {
+            String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
+            String userId = _jwtService.GetUserIdFromToken(token);
+
+            String imgPath = _fileService.StoreImage(profilePicture);
+            await _userService.UpdateProfilePicturePath(imgPath, userId);
+
+            return Ok();
         }
     }
 }

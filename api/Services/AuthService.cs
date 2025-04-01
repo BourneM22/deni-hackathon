@@ -1,12 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Threading.Tasks;
 using api.DTO;
+using api.Exceptions;
 using api.Models;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
@@ -14,7 +8,8 @@ namespace api.Services
 {
     public interface IAuthService
     {
-        Task<LoginResponse> authenticate(LoginRequest request);
+        Task<LoginResponse> Authenticate(LoginRequest request);
+        Task Register(RegisterRequest registerRequest);
     }
 
     public class AuthService : IAuthService
@@ -32,7 +27,7 @@ namespace api.Services
             _jwtConfig = jwtConfig.Value;
         }
 
-        public async Task<LoginResponse> authenticate(LoginRequest request)
+        public async Task<LoginResponse> Authenticate(LoginRequest request)
         {
             String hashedPassword = String.Empty;
             String userId = String.Empty;
@@ -59,7 +54,7 @@ namespace api.Services
                 throw new EmailNotFoundException();
             }
 
-            if (!_passwordHasher.verify(hashedPassword, request.Password))
+            if (!_passwordHasher.Verify(hashedPassword, request.Password))
             {
                 throw new PasswordNotMatchException();
             }
@@ -67,9 +62,39 @@ namespace api.Services
             return new LoginResponse()
             {
                 TokenType = "Bearer",
-                AccessToken = _jwtService.generateToken(userId),
+                AccessToken = _jwtService.GenerateToken(userId),
                 ExpiresIn = _jwtConfig.TokenValidityMins
             };
+        }
+
+        public async Task Register(RegisterRequest registerRequest)
+        {
+            User newUser = new User()
+            {
+                UserId = Guid.NewGuid().ToString(),
+                CreatedDateTime = DateTime.Now,
+                Email = registerRequest.Email,
+                BirthDate = registerRequest.BirthDate,
+                Gender = registerRequest.Gender,
+                Name = registerRequest.Name,
+                Password = _passwordHasher.Hash(registerRequest.Password)
+            };
+
+            String query = "insert into USER (user_id, email, birth_date, created_date_time, gender, name, password) " +
+                "values (?, ?, ?, ?, ?, ?, ?);";
+
+            using MySqlConnection conn = _dbConnection.GetConnection();
+            using MySqlCommand cmd = new MySqlCommand(query, conn);
+
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = newUser.UserId });
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = newUser.Email });
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Timestamp, Value = newUser.BirthDate });
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Timestamp, Value = newUser.CreatedDateTime });
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = newUser.Gender });
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = newUser.Name });
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = newUser.Password });
+
+            int res = await cmd.ExecuteNonQueryAsync();
         }
     }
 }

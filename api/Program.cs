@@ -1,9 +1,7 @@
 using api.Models;
 using api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using NSwag.Generation.Processors.Security;
 using System.Text;
 
@@ -36,6 +34,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IFileService, FileService>();
 
 builder.Services.AddAuthentication(options =>
 {

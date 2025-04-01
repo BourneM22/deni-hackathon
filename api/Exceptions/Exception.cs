@@ -1,0 +1,52 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace api.Exceptions
+{
+    public class EmailNotFoundException : Exception
+    {
+        public EmailNotFoundException() { }
+
+        public EmailNotFoundException(string message) : base(message) { }
+
+        public EmailNotFoundException(string message, Exception inner) : base(message, inner) { }
+    }
+
+    public class PasswordNotMatchException : Exception
+    {
+        public PasswordNotMatchException() { }
+
+        public PasswordNotMatchException(string message) : base(message) { }
+
+        public PasswordNotMatchException(string message, Exception inner) : base(message, inner) { }
+    }
+
+    public class UserNotFoundException : Exception
+    {
+        public UserNotFoundException() { }
+
+        public UserNotFoundException(string message) : base(message) { }
+
+        public UserNotFoundException(string message, Exception inner) : base(message, inner) { }
+    }
+
+    public class ImageExtensionException : Exception
+    {
+        public ImageExtensionException() { }
+
+        public ImageExtensionException(string message) : base(message) { }
+
+        public ImageExtensionException(string message, Exception inner) : base(message, inner) { }
+    }
+
+    public class FileSizeExceedException : Exception
+    {
+        public FileSizeExceedException() { }
+
+        public FileSizeExceedException(string message) : base(message) { }
+
+        public FileSizeExceedException(string message, Exception inner) : base(message, inner) { }
+    }
+}

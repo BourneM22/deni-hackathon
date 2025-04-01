@@ -13,8 +13,8 @@ namespace api.Services
 {
     public interface IJwtService
     {
-        String generateToken(String UserId);
-        String getUserIdFromToken(string token);
+        String GenerateToken(String UserId);
+        String GetUserIdFromToken(string token);
     }
     public class JwtService : IJwtService
     {
@@ -25,7 +25,7 @@ namespace api.Services
             _configuration = configuration;
             _jwtConfig = jwtConfig.Value;
         }
-        public String generateToken(String UserId)
+        public String GenerateToken(String UserId)
         {
             DateTime tokenExpiredTime = DateTime.UtcNow.AddMinutes(_jwtConfig.TokenValidityMins);
 
@@ -49,7 +49,7 @@ namespace api.Services
             return accessToken;
         }
 
-        public string? getUserIdFromToken(string token)
+        public string? GetUserIdFromToken(string token)
         {
             if (string.IsNullOrEmpty(token))
             {

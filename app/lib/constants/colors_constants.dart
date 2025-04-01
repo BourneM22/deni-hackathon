@@ -14,5 +14,6 @@ class ColorsConstants {
   static const Color darkGreyColor = Color(0xFF262626);
   static const Color lightGreyColor = Color(0xFFCCCCCC);
   static const Color mediumGreyColor = Color(0xFF7E7E7E);
+  static const Color blackToastColor = Colors.black54;
   static const Color transparentColor = Colors.transparent;
 }

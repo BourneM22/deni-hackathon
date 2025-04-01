@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class RegisterDialog extends StatelessWidget {
+  const RegisterDialog({super.key});
+
   @override
   Widget build(BuildContext context) {
     return GetBuilder<RegisterController>(

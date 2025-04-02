@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using api.DTO;
 using api.Enum;
+using api.Models;
 using api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,25 +29,68 @@ namespace api.Controllers
         [Route("[action]")]
         public async Task<IActionResult> GetReminders([FromQuery] String? reminderId, [FromQuery] IsDone? isDone)
         {
+            List<ReminderResponse> reminders = new List<ReminderResponse>();
+
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
             String userId = _jwtService.GetUserIdFromToken(token);
-
-            if (IsDone.UNDONE.Equals(isDone))
-            {
-                return Ok(await _reminderService.GetAllUndoneReminders(userId));
-            }
-
-            if (IsDone.DONE.Equals(isDone))
-            {
-                return Ok(await _reminderService.GetAllDoneReminders(userId));
-            }
 
             if (!String.IsNullOrEmpty(reminderId))
             {
                 return Ok(await _reminderService.GetReminderById(reminderId, userId));
             }
 
-            return Ok(await _reminderService.GetAllReminders(userId));
+            reminders = await _reminderService.GetAllReminders(userId);
+
+            if (IsDone.UNDONE.Equals(isDone))
+            {
+                reminders = reminders.Where(r => r.IsDone == IsDone.UNDONE).ToList();
+            }
+
+            if (IsDone.DONE.Equals(isDone))
+            {
+                reminders = reminders.Where(r => r.IsDone == IsDone.DONE).ToList();
+            }
+
+            return Ok(reminders);
+        }
+
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> GetRemindersByDate([FromQuery] String? date, [FromQuery] IsDone? isDone)
+        {
+            DateTime parsedDate = DateTime.Now;
+            List<ReminderResponse> reminders = new List<ReminderResponse>();
+
+            String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
+            String userId = _jwtService.GetUserIdFromToken(token);
+
+            if (date == null)
+            {
+                reminders = await _reminderService.GetSpecificDateReminders(userId, DateOnly.FromDateTime(DateTime.Today));
+            } else
+            {
+                try
+                {
+                    parsedDate = DateTime.Parse(date);
+
+                    reminders = await _reminderService.GetSpecificDateReminders(userId,  DateOnly.FromDateTime(parsedDate));
+                } catch
+                {
+                    return BadRequest("Date format must be yyyy-mm-dd");
+                }
+            }
+
+            if (IsDone.UNDONE.Equals(isDone))
+            {
+                reminders = reminders.Where(r => r.IsDone == IsDone.UNDONE).ToList();
+            }
+
+            if (IsDone.DONE.Equals(isDone))
+            {
+                reminders = reminders.Where(r => r.IsDone == IsDone.DONE).ToList();
+            }
+
+            return Ok(reminders);
         }
 
         [HttpPost]

@@ -23,21 +23,20 @@ namespace api.Controllers
         [Route("[action]")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             try
             {
                 LoginResponse response = await _authService.Authenticate(request);
 
                 return Ok(response);
             }
-            catch (Exception e)
+            catch
             {
-                if (e is EmailNotFoundException)
-                {
-                    return BadRequest("Email doesn't exist!");
-                } else
-                {
-                    return Unauthorized("Email and password doesn't match!");
-                }
+                return BadRequest("Email and password doesn't match!");
             }
         }
 

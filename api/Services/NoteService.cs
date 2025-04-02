@@ -1,4 +1,3 @@
-using System.Data.Common;
 using api.DTO;
 using api.Exceptions;
 using api.Models;
@@ -17,9 +16,9 @@ namespace api.Services
 
     public class NoteService : INoteService
     {
-        private readonly Models.DbConnection _dbConnection;
+        private readonly DbConnection _dbConnection;
 
-        public NoteService(Models.DbConnection dbConnection)
+        public NoteService(DbConnection dbConnection)
         {
             _dbConnection = dbConnection;
         }

@@ -13,8 +13,6 @@ namespace api.Services
     public interface IReminderService
     {
         Task<List<ReminderResponse>> GetAllReminders(string userId);
-        Task<List<ReminderResponse>> GetAllUndoneReminders(String userId);
-        Task<List<ReminderResponse>> GetAllDoneReminders(String userId);
         Task<List<ReminderResponse>> GetSpecificDateReminders(String userId, DateOnly date);
         Task<ReminderResponse> GetReminderById(String reminderId, String userId);
         Task AddNewReminder(String userId, ReminderRequest reminderRequest);
@@ -68,80 +66,6 @@ namespace api.Services
             }
 
             return reminders.OrderBy(r => r.IsDone).ThenByDescending(r => r.PriorityId).ThenBy(r => r.DeadlineDate).ToList();
-        }
-
-        public async Task<List<ReminderResponse>> GetAllUndoneReminders(String userId)
-        {
-            List<ReminderResponse> reminders = new List<ReminderResponse>();
-
-            String query = "select reminder_id, p.priority_id, p.name, title, deadline_date, start_time, end_time, description, is_done " +
-                "from REMINDER r " +
-                "join PRIORITY p on p.priority_id = r.priority_id " +
-                "where user_id = ? and is_done = 0;";
-
-            using MySqlConnection conn = _dbConnection.GetConnection();
-            using MySqlCommand cmd = new MySqlCommand(query, conn);
-
-            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = userId });
-
-            using var reader = await cmd.ExecuteReaderAsync();
-
-            while (await reader.ReadAsync())
-            {
-                ReminderResponse reminder = new ReminderResponse()
-                {
-                    ReminderId = reader["REMINDER_ID"].ToString()!,
-                    PriorityId = int.Parse(reader["PRIORITY_ID"].ToString()!),
-                    PriorityName = reader["NAME"].ToString()!,
-                    Title = reader["TITLE"].ToString()!,
-                    DeadlineDate = DateOnly.FromDateTime(DateTime.Parse(reader["DEADLINE_DATE"].ToString()!)),
-                    StartTime = DateTime.Parse(reader["START_TIME"].ToString()!),
-                    EndTime = DateTime.Parse(reader["END_TIME"].ToString()!),
-                    Description = reader["DESCRIPTION"].ToString()!,
-                    IsDone = (IsDone) int.Parse(reader["IS_DONE"].ToString()!)
-                };
-
-                reminders.Add(reminder);
-            }
-
-            return reminders.OrderBy(r => r.PriorityId).ThenBy(r => r.DeadlineDate).ToList();
-        }
-
-        public async Task<List<ReminderResponse>> GetAllDoneReminders(String userId)
-        {
-            List<ReminderResponse> reminders = new List<ReminderResponse>();
-
-            String query = "select reminder_id, p.priority_id, p.name, title, deadline_date, start_time, end_time, description, is_done " +
-                "from REMINDER r " +
-                "join PRIORITY p on p.priority_id = r.priority_id " +
-                "where user_id = ? and is_done = 1;";
-
-            using MySqlConnection conn = _dbConnection.GetConnection();
-            using MySqlCommand cmd = new MySqlCommand(query, conn);
-
-            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = userId });
-
-            using var reader = await cmd.ExecuteReaderAsync();
-
-            while (await reader.ReadAsync())
-            {
-                ReminderResponse reminder = new ReminderResponse()
-                {
-                    ReminderId = reader["REMINDER_ID"].ToString()!,
-                    PriorityId = int.Parse(reader["PRIORITY_ID"].ToString()!),
-                    PriorityName = reader["NAME"].ToString()!,
-                    Title = reader["TITLE"].ToString()!,
-                    DeadlineDate = DateOnly.FromDateTime(DateTime.Parse(reader["DEADLINE_DATE"].ToString()!)),
-                    StartTime = DateTime.Parse(reader["START_TIME"].ToString()!),
-                    EndTime = DateTime.Parse(reader["END_TIME"].ToString()!),
-                    Description = reader["DESCRIPTION"].ToString()!,
-                    IsDone = (IsDone) int.Parse(reader["IS_DONE"].ToString()!)
-                };
-
-                reminders.Add(reminder);
-            }
-
-            return reminders.OrderBy(r => r.PriorityId).ThenBy(r => r.DeadlineDate).ToList();
         }
 
         public async Task<List<ReminderResponse>> GetSpecificDateReminders(String userId, DateOnly date)

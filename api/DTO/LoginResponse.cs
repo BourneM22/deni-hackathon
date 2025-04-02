@@ -9,6 +9,6 @@ namespace api.DTO
     {
         public String TokenType { get; set; } = String.Empty;
         public String AccessToken { get; set; } = String.Empty;
-        public long ExpiresIn { get; set; }
+        public long ExpiresInMinutes { get; set; }
     }
 }

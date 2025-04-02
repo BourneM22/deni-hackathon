@@ -14,23 +14,27 @@ namespace api.Models
         {
             _mySql = mySql.Value;
         }
-        private String ConnectionStringBuilder(DbConfig dbConfig)
+        private String MySqlConnectionStringBuilder(MySqlModel mySqlModel)
         {
             MySqlConnectionStringBuilder connBuilder = new MySqlConnectionStringBuilder()
             {
-                Server = dbConfig.Server,
-                Database = dbConfig.Database,
-                UserID = dbConfig.Uid,
-                Password = dbConfig.Password,
-                Port = (uint)dbConfig.Port,
+                Server = mySqlModel.Server,
+                Database = mySqlModel.Database,
+                UserID = mySqlModel.Uid,
+                Password = mySqlModel.Password,
+                Port = (uint)mySqlModel.Port,
                 SslMode = MySqlSslMode.Disabled,
+                MinimumPoolSize = (uint)mySqlModel.MinPoolSize,
+                MaximumPoolSize = (uint)mySqlModel.MaxPoolSize,
+                ConnectionTimeout = (uint)mySqlModel.ConnectionTimeout,
+                DefaultCommandTimeout = (uint)mySqlModel.DefaultCommandTimeOut
             };
 
             return connBuilder.ToString();
         }
         public MySqlConnection GetConnection()
         {
-            String connString = ConnectionStringBuilder(_mySql);
+            String connString = MySqlConnectionStringBuilder(_mySql);
             MySqlConnection mySqlConn = new MySqlConnection(connString);
             
             if (mySqlConn.State != System.Data.ConnectionState.Open)

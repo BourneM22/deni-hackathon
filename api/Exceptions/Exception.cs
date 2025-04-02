@@ -49,4 +49,58 @@ namespace api.Exceptions
 
         public FileSizeExceedException(string message, Exception inner) : base(message, inner) { }
     }
+
+    public class EmptyFileNameException : Exception
+    {
+        public EmptyFileNameException() { }
+
+        public EmptyFileNameException(string message) : base(message) { }
+
+        public EmptyFileNameException(string message, Exception inner) : base(message, inner) { }
+    }
+
+    public class FileNotFoundException : Exception
+    {
+        public FileNotFoundException() { }
+
+        public FileNotFoundException(string message) : base(message) { }
+
+        public FileNotFoundException(string message, Exception inner) : base(message, inner) { }
+    }
+
+    public class EmailAlreadyExistException : Exception
+    {
+        public EmailAlreadyExistException() { }
+
+        public EmailAlreadyExistException(string message) : base(message) { }
+
+        public EmailAlreadyExistException(string message, Exception inner) : base(message, inner) { }
+    }
+
+    public class ReminderNotFoundException : Exception
+    {
+        public ReminderNotFoundException() { }
+
+        public ReminderNotFoundException(string message) : base(message) { }
+
+        public ReminderNotFoundException(string message, Exception inner) : base(message, inner) { }
+    }
+
+    public class NoteNotFoundException : Exception
+    {
+        public NoteNotFoundException() { }
+
+        public NoteNotFoundException(string message) : base(message) { }
+
+        public NoteNotFoundException(string message, Exception inner) : base(message, inner) { }
+    }
+
+    public class PriorityIdNotExistException : Exception
+    {
+        public PriorityIdNotExistException() { }
+
+        public PriorityIdNotExistException(string message) : base(message) { }
+
+        public PriorityIdNotExistException(string message, Exception inner) : base(message, inner) { }
+    }
 }

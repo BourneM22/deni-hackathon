@@ -1,4 +1,5 @@
 using api.DTO;
+using api.Exceptions;
 using api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -34,6 +35,11 @@ namespace api.Controllers
         [Route("[action]")]
         public async Task<IActionResult> UpdateUserInfo([FromBody] RegisterRequest registerRequest)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
             String userId = _jwtService.GetUserIdFromToken(token);
 
@@ -49,10 +55,31 @@ namespace api.Controllers
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
             String userId = _jwtService.GetUserIdFromToken(token);
 
-            String imgPath = _fileService.StoreImage(profilePicture);
-            await _userService.UpdateProfilePicturePath(imgPath, userId);
+            try
+            {
+                String imgPath = _fileService.StoreImage(profilePicture);
+                await _userService.UpdateProfilePicturePath(imgPath, userId);
 
-            return Ok();
+                return Ok();
+            } catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> GetProfilePictureImg()
+        {
+            String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
+            String userId = _jwtService.GetUserIdFromToken(token);
+
+            ProfilePictureBytes profilePictureBytes = await _userService.GetProfilePictureByte(userId);
+
+            return new FileContentResult(profilePictureBytes.ImgBytes, "application/octet-stream")
+            {
+                FileDownloadName = profilePictureBytes.FileName
+            };
         }
     }
 }

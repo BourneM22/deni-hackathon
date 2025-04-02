@@ -71,3 +71,5 @@ D:\Coding\deni-hackathon\api\obj\Debug\net9.0\refint\api.dll
 D:\Coding\deni-hackathon\api\obj\Debug\net9.0\api.pdb
 D:\Coding\deni-hackathon\api\obj\Debug\net9.0\api.genruntimeconfig.cache
 D:\Coding\deni-hackathon\api\obj\Debug\net9.0\ref\api.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\LazyCache.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\LazyCache.AspNetCore.dll

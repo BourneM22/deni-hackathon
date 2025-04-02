@@ -15,5 +15,6 @@ namespace api.Models
         public String Password { get; set; } = String.Empty;
         public String ProfilePicturePath { get; set; } = String.Empty;
         public DateTime CreatedDateTime { get; set; }
+        public int IsAdmin { get; set; }
     }
 }

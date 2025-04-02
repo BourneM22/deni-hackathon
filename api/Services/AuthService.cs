@@ -63,12 +63,17 @@ namespace api.Services
             {
                 TokenType = "Bearer",
                 AccessToken = _jwtService.GenerateToken(userId),
-                ExpiresIn = _jwtConfig.TokenValidityMins
+                ExpiresInMinutes = _jwtConfig.TokenValidityMins
             };
         }
 
         public async Task Register(RegisterRequest registerRequest)
         {
+            if (await CheckEmailAlreadyExist(registerRequest.Email))
+            {
+                throw new EmailAlreadyExistException();
+            }
+
             User newUser = new User()
             {
                 UserId = Guid.NewGuid().ToString(),
@@ -77,11 +82,12 @@ namespace api.Services
                 BirthDate = registerRequest.BirthDate,
                 Gender = registerRequest.Gender,
                 Name = registerRequest.Name,
-                Password = _passwordHasher.Hash(registerRequest.Password)
+                Password = _passwordHasher.Hash(registerRequest.Password),
+                IsAdmin = 0
             };
 
-            String query = "insert into USER (user_id, email, birth_date, created_date_time, gender, name, password) " +
-                "values (?, ?, ?, ?, ?, ?, ?);";
+            String query = "insert into USER (user_id, email, birth_date, created_date_time, gender, name, password, admin) " +
+                "values (?, ?, ?, ?, ?, ?, ?, ?);";
 
             using MySqlConnection conn = _dbConnection.GetConnection();
             using MySqlCommand cmd = new MySqlCommand(query, conn);
@@ -93,8 +99,30 @@ namespace api.Services
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = newUser.Gender });
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = newUser.Name });
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = newUser.Password });
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = newUser.IsAdmin });
 
             int res = await cmd.ExecuteNonQueryAsync();
+        }
+
+        public async Task<bool> CheckEmailAlreadyExist(String email)
+        {
+            String query = "select email " +
+                "from USER " + 
+                "where email = ?;";
+
+            using MySqlConnection conn = _dbConnection.GetConnection();
+            using MySqlCommand cmd = new MySqlCommand(query, conn);
+
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = email });
+
+            using var reader = await cmd.ExecuteReaderAsync();
+
+            if (await reader.ReadAsync())
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

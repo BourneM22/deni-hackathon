@@ -1,4 +1,5 @@
 using api.DTO;
+using api.Enum;
 using api.Exceptions;
 using api.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -49,9 +50,16 @@ namespace api.Controllers
                 return BadRequest(ModelState);
             }
 
-            await _authService.Register(registerRequest);
+            try
+            {
+                await _authService.Register(registerRequest);
 
-            return Ok();
+                return Ok();
+
+            } catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
     }
 }

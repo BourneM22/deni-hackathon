@@ -1,42 +1,45 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-public class GenderValidationAttribute : ValidationAttribute
+namespace api.Validator
 {
-    public override Boolean IsValid(object? value)
+    public class GenderValidationAttribute : ValidationAttribute
     {
-        // Ensure the value is not null or empty
-        if (value is Char gender && !String.IsNullOrEmpty(gender.ToString()))
+        public override Boolean IsValid(object? value)
         {
-            // Only accept "M" or "F"
-            return gender == 'M' || gender == 'F';
+            // Ensure the value is not null or empty
+            if (value is Char gender && !String.IsNullOrEmpty(gender.ToString()))
+            {
+                // Only accept "M" or "F"
+                return gender == 'M' || gender == 'F';
+            }
+
+            // If value is null or doesn't match "M" or "F", it's invalid
+            return false;
         }
 
-        // If value is null or doesn't match "M" or "F", it's invalid
-        return false;
-    }
-
-    public override string FormatErrorMessage(string name)
-    {
-        return $"{name} must be either 'M' or 'F'.";
-    }
-}
-
-public class DateLessThanTodayAttribute : ValidationAttribute
-{
-    public override bool IsValid(object? value)
-    {
-        if (value is DateOnly dateTime)
+        public override string FormatErrorMessage(string name)
         {
-            // Compare the given date with the current date (ignoring time part)
-            return dateTime <= DateOnly.FromDateTime(DateTime.Today);
+            return $"{name} must be either 'M' or 'F'.";
+        }
+    }
+
+    public class DateLessThanTodayAttribute : ValidationAttribute
+    {
+        public override bool IsValid(object? value)
+        {
+            if (value is DateOnly dateTime)
+            {
+                // Compare the given date with the current date (ignoring time part)
+                return dateTime <= DateOnly.FromDateTime(DateTime.Today);
+            }
+
+            return false;
         }
 
-        return false;
-    }
-
-    public override string FormatErrorMessage(string name)
-    {
-        return $"{name} must be a date before today.";
+        public override string FormatErrorMessage(string name)
+        {
+            return $"{name} must be a date before today.";
+        }
     }
 }

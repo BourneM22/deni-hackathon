@@ -4,13 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using api.Enum;
 
-namespace api.Models
+namespace api.DTO
 {
-    public class Reminder
+    public class ReminderResponse
     {
         public String ReminderId { get; set; } = String.Empty;
-        public String UserId { get; set; } = String.Empty;
-        public String PriorityId { get; set; } = String.Empty;
+        public int PriorityId { get; set; }
+        public String PriorityName { get; set; } = String.Empty;
         public String Title { get; set; } = String.Empty;
         public DateOnly DeadlineDate { get; set; }
         public DateTime StartTime { get; set; }

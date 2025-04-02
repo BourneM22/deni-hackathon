@@ -28,10 +28,14 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.Configure<MySqlModel>(builder.Configuration.GetSection("MySql"));
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
+builder.Services.Configure<FileConfig>(builder.Configuration.GetSection("FileConfig"));
 
 builder.Services.AddTransient<DbConnection>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<INoteService, NoteService>();
+builder.Services.AddScoped<IPriorityService, PriorityService>();
+builder.Services.AddScoped<IReminderService, ReminderService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IFileService, FileService>();

@@ -1,17 +1,20 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace api.Models
+namespace api.DTO
 {
-    public class Note
+    public class UpdateNoteRequest
     {
+        [Required]
         public String NoteId { get; set; } = String.Empty;
-        public String UserId { get; set;} = String.Empty;
+
+        [Required]
         public String Title { get; set;} = String.Empty;
+
+        [Required]
         public String Content { get; set;} = String.Empty;
-        public DateTime CreatedDateTime { get; set;}
-        public DateTime ModifiedDateTime { get; set;}
     }
 }

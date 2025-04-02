@@ -13,7 +13,7 @@ namespace api.Services
 {
     public interface IJwtService
     {
-        String GenerateToken(String UserId);
+        String GenerateToken(String userId);
         String GetUserIdFromToken(string token);
     }
     public class JwtService : IJwtService
@@ -25,7 +25,7 @@ namespace api.Services
             _configuration = configuration;
             _jwtConfig = jwtConfig.Value;
         }
-        public String GenerateToken(String UserId)
+        public String GenerateToken(String userId)
         {
             DateTime tokenExpiredTime = DateTime.UtcNow.AddMinutes(_jwtConfig.TokenValidityMins);
 
@@ -33,7 +33,7 @@ namespace api.Services
             {
                 Subject = new ClaimsIdentity(new []
                 {
-                    new Claim(JwtRegisteredClaimNames.Name, UserId)
+                    new Claim(JwtRegisteredClaimNames.Name, userId)
                 }),
                 Expires = tokenExpiredTime,
                 Issuer = _jwtConfig.Issuer,

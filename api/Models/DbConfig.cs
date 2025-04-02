@@ -15,6 +15,9 @@ namespace api.Models
     }
     public class MySqlModel : DbConfig
     {
-        
+        public int MinPoolSize { get; set; }
+        public int MaxPoolSize { get; set; }
+        public int ConnectionTimeout { get; set; }
+        public int DefaultCommandTimeOut { get; set; }
     }
 }

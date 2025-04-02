@@ -7,24 +7,28 @@ namespace api.Services
 {
     public interface IUserService
     {
-        Task<User> GetUserInfo(string userId);
+        Task<UserInfoResponse> GetUserInfo(string userId);
         Task UpdateUserInfo(RegisterRequest registerRequest, String userId);
         Task UpdateProfilePicturePath(String newProfilePicturePath, String userId);
+        Task<ProfilePictureBytes> GetProfilePictureByte(String userId);
+        Task<Boolean> CheckIsAdmin(String userId);
     }
     public class UserService : IUserService
     {
         private readonly DbConnection _dbConnection;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly IFileService _fileService;
 
-        public UserService(DbConnection dbConnection, IPasswordHasher passwordHasher)
+        public UserService(DbConnection dbConnection, IPasswordHasher passwordHasher, IFileService fileService)
         {
             _dbConnection = dbConnection;
             _passwordHasher = passwordHasher;
+            _fileService = fileService;
         }
 
-        public async Task<User> GetUserInfo(string userId)
+        public async Task<UserInfoResponse> GetUserInfo(string userId)
         {
-            User? user = null;
+            UserInfoResponse? user = null;
 
             String query = "select name, gender, birth_date, email, password, profile_picture_path " +
                 "from USER " + 
@@ -39,14 +43,12 @@ namespace api.Services
 
             if (await reader.ReadAsync())
             {
-                User tempUser = new User()
+                UserInfoResponse tempUser = new UserInfoResponse()
                 {
                     Name = reader["NAME"].ToString()!,
                     Gender = Char.Parse(reader["GENDER"].ToString()!.Substring(0, 1)),
                     BirthDate = DateOnly.FromDateTime(DateTime.Parse(reader["BIRTH_DATE"].ToString()!)),
-                    Email = reader["EMAIL"].ToString()!,
-                    Password = reader["PASSWORD"].ToString()!,
-                    ProfilePicturePath = reader["PROFILE_PICTURE_PATH"].ToString()!
+                    Email = reader["EMAIL"].ToString()!
                 };
 
                 user = tempUser;
@@ -92,6 +94,79 @@ namespace api.Services
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = userId });
 
             int res = await cmd.ExecuteNonQueryAsync();
+        }
+
+        public async Task<ProfilePictureBytes> GetProfilePictureByte(String userId)
+        {
+            String profilePicturePath = String.Empty;
+
+            String query = "select profile_picture_path " +
+                "from USER " + 
+                "where user_id = ?;";
+
+            using var conn = _dbConnection.GetConnection();
+            using var cmd = new MySqlCommand(query, conn);
+
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = userId });
+
+            using var reader = await cmd.ExecuteReaderAsync();
+
+            if (await reader.ReadAsync())
+            {
+                if (reader["PROFILE_PICTURE_PATH"] != DBNull.Value)
+                {
+                    profilePicturePath = reader["PROFILE_PICTURE_PATH"].ToString()!;
+                }
+            }
+
+            if (String.IsNullOrEmpty(profilePicturePath))
+            {
+                String imgName = "default.jpg";
+                return new ProfilePictureBytes()
+                {
+                    ImgBytes = _fileService.GetImageByte(imgName),
+                    FileName = imgName
+                };
+            }
+
+            return new ProfilePictureBytes()
+            {
+                ImgBytes = _fileService.GetImageByte(profilePicturePath),
+                FileName = profilePicturePath
+            };
+        }
+
+        public async Task<bool> CheckIsAdmin(string userId)
+        {
+            int? response = null;
+
+            String query = "select is_admin " +
+                "from USER " + 
+                "where user_id = ?;";
+
+            using var conn = _dbConnection.GetConnection();
+            using var cmd = new MySqlCommand(query, conn);
+
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = userId });
+
+            using var reader = await cmd.ExecuteReaderAsync();
+
+            if (await reader.ReadAsync())
+            {
+                response = int.Parse(reader["IS_ADMIN"].ToString()!);
+            }
+            
+            if (response == null)
+            {
+                throw new UserNotFoundException();
+            }
+
+            if (response == 1)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

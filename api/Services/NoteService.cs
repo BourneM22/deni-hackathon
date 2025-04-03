@@ -1,6 +1,7 @@
 using api.DTO;
 using api.Exceptions;
 using api.Models;
+using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
 namespace api.Services
@@ -13,15 +14,20 @@ namespace api.Services
         Task<NoteResponse> GetNoteById(String userId, String noteId);
         Task<List<NoteResponse>> GetAllNotesByTagId(String userId, String noteTagId);
         Task DeleteNote(String noteId, String userId);
+        Task<List<NoteResponse>> SearchNoteByKeyword(String userId, String keyword);
     }
 
     public class NoteService : INoteService
     {
         private readonly DbConnection _dbConnection;
+        private readonly SearchingConfig _searchingConfig;
+        private readonly ISearchingService _searchingService;
 
-        public NoteService(DbConnection dbConnection)
+        public NoteService(DbConnection dbConnection, IOptions<SearchingConfig> searchingConfig, ISearchingService searchingService)
         {
             _dbConnection = dbConnection;
+            _searchingConfig = searchingConfig.Value;
+            _searchingService = searchingService;
         }
 
         public async Task AddNewNote(NoteRequest newNoteRequest, String userId)
@@ -187,6 +193,33 @@ namespace api.Services
             }
 
             return notes.OrderByDescending(n => n.ModifiedDateTime).ToList();
+        }
+
+        public async Task<List<NoteResponse>> SearchNoteByKeyword(String userId, String search)
+        {
+            List<NoteResponse> notes = await GetAllNotes(userId);
+            List<Tuple<NoteResponse, Double>> results = new List<Tuple<NoteResponse, double>>();
+
+            search = search.ToLower();
+            Double mismatchTolerance =_searchingConfig.MismatchTolerance;
+
+            foreach (NoteResponse note in notes)
+            {
+                Double titleScore = _searchingService.ComputeCosineSimilarity(search, note.Title.ToLower());
+                Double contentScore = _searchingService.ComputeCosineSimilarity(search, note.Content.ToLower());
+
+                long totalLength = note.Title.Length + note.Content.Length;
+                Double newTolerance = mismatchTolerance / (Double) totalLength;
+
+                if (titleScore >= newTolerance || contentScore >= newTolerance)
+                {
+                    results.Add(new Tuple<NoteResponse, Double>(note, titleScore + contentScore));
+                }
+            }
+
+            results.Sort((a, b) => a.Item2.CompareTo(b.Item2));
+
+            return results.Select(r => r.Item1).ToList();
         }
     }
 }

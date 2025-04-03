@@ -84,3 +84,4 @@ D:\Coding\deni-hackathon\api\bin\Debug\net9.0\NAudio.Lame.dll
 D:\Coding\deni-hackathon\api\bin\Debug\net9.0\NAudio.Midi.dll
 D:\Coding\deni-hackathon\api\bin\Debug\net9.0\NAudio.Wasapi.dll
 D:\Coding\deni-hackathon\api\bin\Debug\net9.0\NAudio.WinMM.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\MathNet.Numerics.dll

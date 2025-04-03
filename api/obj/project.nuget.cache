@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "psnK4PTqD74=",
+  "dgSpecHash": "bS7JMfflSak=",
   "success": true,
   "projectFilePath": "D:\\Coding\\deni-hackathon\\api\\api.csproj",
   "expectedPackageFiles": [
@@ -11,6 +11,7 @@
     "C:\\Users\\hansr\\.nuget\\packages\\k4os.hash.xxhash\\1.0.8\\k4os.hash.xxhash.1.0.8.nupkg.sha512",
     "C:\\Users\\hansr\\.nuget\\packages\\lazycache\\2.4.0\\lazycache.2.4.0.nupkg.sha512",
     "C:\\Users\\hansr\\.nuget\\packages\\lazycache.aspnetcore\\2.4.0\\lazycache.aspnetcore.2.4.0.nupkg.sha512",
+    "C:\\Users\\hansr\\.nuget\\packages\\mathnet.numerics\\5.0.0\\mathnet.numerics.5.0.0.nupkg.sha512",
     "C:\\Users\\hansr\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\9.0.3\\microsoft.aspnetcore.authentication.jwtbearer.9.0.3.nupkg.sha512",
     "C:\\Users\\hansr\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.3\\microsoft.aspnetcore.openapi.9.0.3.nupkg.sha512",
     "C:\\Users\\hansr\\.nuget\\packages\\microsoft.extensions.apidescription.server\\6.0.3\\microsoft.extensions.apidescription.server.6.0.3.nupkg.sha512",

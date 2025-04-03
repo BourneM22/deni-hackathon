@@ -89,5 +89,15 @@ namespace api.Controllers
             
             return Ok();
         }
+
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> SearchNotesByKeyword([FromQuery] String search)
+        {
+            String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
+            String userId = _jwtService.GetUserIdFromToken(token);
+
+            return Ok(await _noteService.SearchNoteByKeyword(userId, search));
+        }
     }
 }

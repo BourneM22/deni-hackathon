@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="LazyCache.AspNetCore" Version="2.4.0" />
+    <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.3" />
     <PackageReference Include="MySql.Data" Version="9.2.0" />

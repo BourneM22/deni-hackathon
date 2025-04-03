@@ -44,7 +44,14 @@ namespace api.Services
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = newPriority.PriorityId });
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = newPriority.Name });
 
-            int resp = await cmd.ExecuteNonQueryAsync();
+            int res = await cmd.ExecuteNonQueryAsync();
+
+            if (res == 0)
+            {
+                throw new Exception();
+            }
+
+            _cacheService.Remove("PRIORITIES_LIST");
         }
 
         public async Task DeletePriority(int priorityId, String userId)
@@ -62,7 +69,12 @@ namespace api.Services
 
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = priorityId });
 
-            int resp = await cmd.ExecuteNonQueryAsync();
+            int res = await cmd.ExecuteNonQueryAsync();
+
+            if (res == 0)
+            {
+                throw new Exception();
+            }
         }
 
         public List<Priority> GetAllPriorities()

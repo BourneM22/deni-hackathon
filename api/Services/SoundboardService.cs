@@ -86,29 +86,15 @@ namespace api.Services
 
             while (await reader.ReadAsync())
             {
-                if (reader["FILTER_ID"] == DBNull.Value)
+                SoundboardResponse soundboard = new SoundboardResponse()
                 {
-                    SoundboardResponse soundboard = new SoundboardResponse()
-                    {
-                        SoundId = reader["SOUND_ID"].ToString()!,
-                        FilterId = null,
-                        Name = reader["NAME"].ToString()!,
-                        Description =  reader["DESCRIPTION"].ToString()!,
-                    };
+                    SoundId = reader["SOUND_ID"].ToString()!,
+                    FilterId = reader["FILTER_ID"] == DBNull.Value ? null : reader["FILTER_ID"].ToString(),
+                    Name = reader["NAME"].ToString()!,
+                    Description =  reader["DESCRIPTION"].ToString()!,
+                };
 
-                    soundboards.Add(soundboard);
-                } else
-                {
-                    SoundboardResponse soundboard = new SoundboardResponse()
-                    {
-                        SoundId = reader["SOUND_ID"].ToString()!,
-                        FilterId = reader["FILTER_ID"].ToString()!,
-                        Name = reader["NAME"].ToString()!,
-                        Description =  reader["DESCRIPTION"].ToString()!,
-                    };
-
-                    soundboards.Add(soundboard);
-                }
+                soundboards.Add(soundboard);
             }
 
             return soundboards;

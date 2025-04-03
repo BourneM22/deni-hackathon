@@ -34,6 +34,16 @@ namespace api.Controllers
             return Ok(await _noteService.GetAllNotes(userId));
         }
 
+        [HttpGet]
+        [Route("[action]/{noteTagId}")]
+        public async Task<IActionResult> GetAllNotesByTagId([FromRoute] String noteTagId)
+        {
+            String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
+            String userId = _jwtService.GetUserIdFromToken(token);
+
+            return Ok(await _noteService.GetAllNotesByTagId(userId, noteTagId));
+        }
+
         [HttpPost]
         [Route("[action]")]
         public async Task<IActionResult> AddNewNote([FromBody] NoteRequest newNoteRequest)

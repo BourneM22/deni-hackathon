@@ -4,26 +4,26 @@ using MySql.Data.MySqlClient;
 
 namespace api.Services
 {
-    public interface ISoundboardFilterService
+    public interface INoteTagService
     {
-        Task<List<SoundboardFilterResponse>> GetAllSounboardFilters(String userId);
-        Task UpdateSounboardFilter(String userId, UpdateSoundboardFilterRequest updateSbFilterReq);
-        Task AddNewSoundboardFilter(String userId, SoundboardFilterRequest soundboardFilterRequest);
-        Task DeleteSoundboardFilter(String userId, String soundboardFilterId);
+        Task<List<NoteTagResponse>> GetAllNoteTags(String userId);
+        Task UpdateNoteTag(String userId, UpdateNoteTagRequest updateNoteTagRequest);
+        Task AddNewNoteTag(String userId, NoteTagRequest noteTagRequest);
+        Task DeleteNoteTag(String userId, String noteTagId);
     }
 
-    public class SoundboardFilterService : ISoundboardFilterService
+    public class NoteTagService : INoteTagService
     {
         private readonly DbConnection _dbConnection;
 
-        public SoundboardFilterService(DbConnection dbConnection)
+        public NoteTagService(DbConnection dbConnection)
         {
             _dbConnection = dbConnection;
         }
 
-        public async Task AddNewSoundboardFilter(string userId, SoundboardFilterRequest soundboardFilterRequest)
+        public async Task AddNewNoteTag(String userId, NoteTagRequest noteTagRequest)
         {
-            String query = "insert into SOUNDBOARD_FILTER (filter_id, user_id, name) " +
+            String query = "insert into NOTE_TAG (tag_id, user_id, name) " +
                 "values (?, ?, ?);";
                 
             using MySqlConnection conn = _dbConnection.GetConnection();
@@ -31,7 +31,7 @@ namespace api.Services
 
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = Guid.NewGuid().ToString() });
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = userId });
-            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = soundboardFilterRequest.Name });
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = noteTagRequest.Name });
 
             int res = await cmd.ExecuteNonQueryAsync();
 
@@ -41,15 +41,15 @@ namespace api.Services
             }
         }
 
-        public async Task DeleteSoundboardFilter(string userId, string soundboardFilterId)
+        public async Task DeleteNoteTag(String userId, String noteTagId)
         {
-            String query = "delete from SOUNDBOARD_FILTER " +
-                "where filter_id = ? and user_id = ?;";
+            String query = "delete from NOTE_TAG " +
+                "where tag_id = ? and user_id = ?;";
                 
             using MySqlConnection conn = _dbConnection.GetConnection();
             using MySqlCommand cmd = new MySqlCommand(query, conn);
 
-            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = soundboardFilterId });
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = noteTagId });
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = userId });
 
             int res = await cmd.ExecuteNonQueryAsync();
@@ -60,12 +60,12 @@ namespace api.Services
             }
         }
 
-        public async Task<List<SoundboardFilterResponse>> GetAllSounboardFilters(string userId)
+        public async Task<List<NoteTagResponse>> GetAllNoteTags(String userId)
         {
-            List<SoundboardFilterResponse> filters = new List<SoundboardFilterResponse>();
+            List<NoteTagResponse> tags = new List<NoteTagResponse>();
 
-            String query = "select filter_id, name " +
-                "from SOUNDBOARD_FILTER " +
+            String query = "select tag_id, name " +
+                "from NOTE_TAG " +
                 "where user_id = ?;";
                 
             using MySqlConnection conn = _dbConnection.GetConnection();
@@ -77,29 +77,29 @@ namespace api.Services
 
             while (await reader.ReadAsync())
             {
-                SoundboardFilterResponse filter = new SoundboardFilterResponse()
+                NoteTagResponse tag = new NoteTagResponse()
                 {
-                    FilterId = reader["FILTER_ID"].ToString()!,
+                    TagId = reader["TAG_ID"].ToString()!,
                     Name = reader["NAME"].ToString()!
                 };
 
-                filters.Add(filter);
+                tags.Add(tag);
             }
 
-            return filters;
+            return tags;
         }
 
-        public async Task UpdateSounboardFilter(string userId, UpdateSoundboardFilterRequest updateSbFilterReq)
+        public async Task UpdateNoteTag(String userId, UpdateNoteTagRequest updateNoteTagRequest)
         {
-            String query = "update SOUNDBOARD_FILTER " +
+            String query = "update NOTE_TAG " +
                 "set name = ? " +
-                "where filter_id = ? and user_id = ?;";
+                "where tag_id = ? and user_id = ?;";
                 
             using MySqlConnection conn = _dbConnection.GetConnection();
             using MySqlCommand cmd = new MySqlCommand(query, conn);
 
-            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = updateSbFilterReq.Name });
-            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = updateSbFilterReq.FilterId });
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = updateNoteTagRequest.Name });
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = updateNoteTagRequest.TagId });
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = userId });
 
             int res = await cmd.ExecuteNonQueryAsync();

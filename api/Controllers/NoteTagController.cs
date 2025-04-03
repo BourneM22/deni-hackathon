@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using api.DTO;
 using api.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -12,30 +8,30 @@ namespace api.Controllers
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class SoundboardFilterController : ControllerBase
+    public class NoteTagController : ControllerBase
     {
-        private readonly ISoundboardFilterService _soundboardFilterService;
+        private readonly INoteTagService _noteTagService;
         private readonly IJwtService _jwtService;
 
-        public SoundboardFilterController(ISoundboardFilterService soundboardFilterService, IJwtService jwtService)
+        public NoteTagController(INoteTagService noteTagService, IJwtService jwtService)
         {
-            _soundboardFilterService = soundboardFilterService;
+            _noteTagService = noteTagService;
             _jwtService = jwtService;
         }
 
         [HttpGet]
         [Route("[action]")]
-        public async Task<IActionResult> GetAllSoundboardFilters()
+        public async Task<IActionResult> GetAllNoteTags()
         {
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
             String userId = _jwtService.GetUserIdFromToken(token);
 
-            return Ok(await _soundboardFilterService.GetAllSounboardFilters(userId));
+            return Ok(await _noteTagService.GetAllNoteTags(userId));
         }
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> AddNewSoundboardFilter([FromBody] SoundboardFilterRequest soundboardFilterRequest)
+        public async Task<IActionResult> AddNewNoteTag([FromBody] NoteTagRequest noteTagRequest)
         {
             if (!ModelState.IsValid)
             {
@@ -45,14 +41,14 @@ namespace api.Controllers
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
             String userId = _jwtService.GetUserIdFromToken(token);
 
-            await _soundboardFilterService.AddNewSoundboardFilter(userId, soundboardFilterRequest);
+            await _noteTagService.AddNewNoteTag(userId, noteTagRequest);
 
             return Ok();
         }
 
         [HttpPut]
         [Route("[action]")]
-        public async Task<IActionResult> UpdateSoundboardFilter([FromBody] UpdateSoundboardFilterRequest updateSoundboardFilterRequest)
+        public async Task<IActionResult> UpdateNoteTag([FromBody] UpdateNoteTagRequest updateNoteTagRequest)
         {
             if (!ModelState.IsValid)
             {
@@ -62,19 +58,19 @@ namespace api.Controllers
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
             String userId = _jwtService.GetUserIdFromToken(token);
 
-            await _soundboardFilterService.UpdateSounboardFilter(userId, updateSoundboardFilterRequest);
+            await _noteTagService.UpdateNoteTag(userId, updateNoteTagRequest);
 
             return Ok();
         }
 
         [HttpDelete]
-        [Route("[action]/{soundboardFilterId}")]
-        public async Task<IActionResult> DeleteSoundboardFilter([FromRoute] String soundboardFilterId)
+        [Route("[action]/{noteTagId}")]
+        public async Task<IActionResult> DeleteNoteTag([FromRoute] String noteTagId)
         {
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
             String userId = _jwtService.GetUserIdFromToken(token);
 
-            await _soundboardFilterService.DeleteSoundboardFilter(userId, soundboardFilterId);
+            await _noteTagService.DeleteNoteTag(userId, noteTagId);
 
             return Ok();
         }

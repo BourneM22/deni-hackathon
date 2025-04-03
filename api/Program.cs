@@ -45,6 +45,7 @@ builder.Services.AddTransient<DbConnection>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<INoteService, NoteService>();
+builder.Services.AddScoped<INoteTagService, NoteTagService>();
 builder.Services.AddScoped<IPriorityService, PriorityService>();
 builder.Services.AddScoped<IReminderService, ReminderService>();
 builder.Services.AddScoped<ISoundboardFilterService, SoundboardFilterService>();

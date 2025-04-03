@@ -49,6 +49,7 @@ namespace api.Services
             return accessToken;
         }
 
+#pragma warning disable CS8766 // Nullability of reference types in return type doesn't match implicitly implemented member (possibly because of nullability attributes).
         public string? GetUserIdFromToken(string token)
         {
             if (string.IsNullOrEmpty(token))
@@ -80,4 +81,5 @@ namespace api.Services
             }
         }
     }
+#pragma warning restore CS8766 // Nullability of reference types in return type doesn't match implicitly implemented member (possibly because of nullability attributes).
 }

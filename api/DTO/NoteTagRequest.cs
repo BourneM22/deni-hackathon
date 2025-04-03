@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace api.Models
+namespace api.DTO
 {
-    public class Folder
+    public class NoteTagRequest
     {
-        public String FolderId { get; set; } = String.Empty;
-        public String UserId { get; set; } = String.Empty;
+        [Required( ErrorMessage = "Name is required")]
         public String Name { get; set; } = String.Empty;
     }
 }

@@ -14,5 +14,7 @@ namespace api.DTO
 
         [Required(ErrorMessage = "Content is required")]
         public String Content { get; set;} = String.Empty;
+
+        public String? TagId { get; set;}
     }
 }

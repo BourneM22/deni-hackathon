@@ -16,5 +16,7 @@ namespace api.DTO
 
         [Required]
         public String Content { get; set;} = String.Empty;
+
+        public String? TagId { get; set;}
     }
 }

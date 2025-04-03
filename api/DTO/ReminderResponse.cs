@@ -16,6 +16,7 @@ namespace api.DTO
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public String Description { get; set; } = String.Empty;
-        public IsDone IsDone { get; set; }
+        public IsDone? IsDone { get; set; }
+        public ReminderType Type { get; set; }
     }
 }

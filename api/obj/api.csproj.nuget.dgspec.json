@@ -60,6 +60,14 @@
               "target": "Package",
               "version": "[9.2.0, )"
             },
+            "NAudio": {
+              "target": "Package",
+              "version": "[2.2.1, )"
+            },
+            "NAudio.Lame": {
+              "target": "Package",
+              "version": "[2.1.0, )"
+            },
             "NSwag.AspNetCore": {
               "target": "Package",
               "version": "[14.2.0, )"
@@ -67,6 +75,10 @@
             "Swashbuckle.AspNetCore.SwaggerUI": {
               "target": "Package",
               "version": "[8.0.0, )"
+            },
+            "System.Speech": {
+              "target": "Package",
+              "version": "[9.0.3, )"
             }
           },
           "imports": [

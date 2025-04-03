@@ -1,4 +1,5 @@
 using api.DTO;
+using api.Enum;
 using api.Exceptions;
 using api.Models;
 using Microsoft.Extensions.Options;
@@ -83,7 +84,7 @@ namespace api.Services
                 Gender = registerRequest.Gender,
                 Name = registerRequest.Name,
                 Password = _passwordHasher.Hash(registerRequest.Password),
-                IsAdmin = 0
+                IsAdmin = IsAdmin.USER
             };
 
             String query = "insert into USER (user_id, email, birth_date, created_date_time, gender, name, password, admin) " +

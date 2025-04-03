@@ -1,4 +1,5 @@
 using api.DTO;
+using api.Enum;
 using api.Exceptions;
 using api.Models;
 using MySql.Data.MySqlClient;
@@ -161,7 +162,7 @@ namespace api.Services
                 throw new UserNotFoundException();
             }
 
-            if (response == 1)
+            if (IsAdmin.ADMIN.Equals(response))
             {
                 return true;
             }

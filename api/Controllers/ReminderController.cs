@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using api.DTO;
 using api.Enum;
-using api.Models;
 using api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -41,14 +36,14 @@ namespace api.Controllers
 
             reminders = await _reminderService.GetAllReminders(userId);
 
-            if (IsDone.UNDONE.Equals(isDone))
+            if (isDone.Equals(IsDone.UNDONE))
             {
-                reminders = reminders.Where(r => r.IsDone == IsDone.UNDONE).ToList();
+                reminders = reminders.Where(r => r.IsDone.Equals(IsDone.UNDONE)).ToList();
             }
 
-            if (IsDone.DONE.Equals(isDone))
+            if (isDone.Equals(IsDone.DONE))
             {
-                reminders = reminders.Where(r => r.IsDone == IsDone.DONE).ToList();
+                reminders = reminders.Where(r => r.IsDone.Equals(IsDone.DONE)).ToList();
             }
 
             return Ok(reminders);
@@ -80,14 +75,14 @@ namespace api.Controllers
                 }
             }
 
-            if (IsDone.UNDONE.Equals(isDone))
+            if (isDone.Equals(IsDone.UNDONE))
             {
-                reminders = reminders.Where(r => r.IsDone == IsDone.UNDONE).ToList();
+                reminders = reminders.Where(r => r.IsDone.Equals(IsDone.UNDONE)).ToList();
             }
 
-            if (IsDone.DONE.Equals(isDone))
+            if (isDone.Equals(IsDone.DONE))
             {
-                reminders = reminders.Where(r => r.IsDone == IsDone.DONE).ToList();
+                reminders = reminders.Where(r => r.IsDone.Equals(IsDone.DONE)).ToList();
             }
 
             return Ok(reminders);

@@ -39,6 +39,7 @@ builder.Services.AddControllers();
 builder.Services.Configure<MySqlModel>(builder.Configuration.GetSection("MySql"));
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
 builder.Services.Configure<FileConfig>(builder.Configuration.GetSection("FileConfig"));
+builder.Services.Configure<ProfilePictureConfig>(builder.Configuration.GetSection("ProfilePictureConfig"));
 
 builder.Services.AddTransient<DbConnection>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -51,6 +52,7 @@ builder.Services.AddScoped<ISoundbardService, SoundboardService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<ITextToSpeechService, TextToSpeechService>();
 
 builder.Services.AddAuthentication(options =>
 {

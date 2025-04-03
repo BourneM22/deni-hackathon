@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using api.Enum;
 
 namespace api.Models
 {
@@ -15,6 +16,6 @@ namespace api.Models
         public String Password { get; set; } = String.Empty;
         public String ProfilePicturePath { get; set; } = String.Empty;
         public DateTime CreatedDateTime { get; set; }
-        public int IsAdmin { get; set; }
+        public IsAdmin IsAdmin { get; set; }
     }
 }

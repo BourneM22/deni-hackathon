@@ -13,10 +13,12 @@ namespace api.Services
     public class FileService : IFileService
     {
         private readonly FileConfig _fileConfig;
+        private readonly ProfilePictureConfig _profilePictureConfig;
 
-        public FileService(IOptions<FileConfig> fileConfig)
+        public FileService(IOptions<FileConfig> fileConfig, IOptions<ProfilePictureConfig> profilePictureConfig)
         {
             _fileConfig = fileConfig.Value;
+            _profilePictureConfig = profilePictureConfig.Value;
         }
 
         public String StoreImage(IFormFile profilePicture)
@@ -27,7 +29,7 @@ namespace api.Services
             }
 
             // extensions
-            List<String> extensions = new List<string>() { ".jpg", ".jpeg", ".png"} ;
+            List<String> extensions = _profilePictureConfig.AllowedExtensions ;
             String imgExtension = Path.GetExtension(profilePicture.FileName);
 
             if (!extensions.Contains(imgExtension))
@@ -37,9 +39,9 @@ namespace api.Services
 
             // size
             long size = profilePicture.Length;
-            if (size > (5 * 1024 * 1024))
+            if (size > (_profilePictureConfig.MaxFileSizeInMB * 1024 * 1024))
             {
-                throw new FileSizeExceedException("File size must be under 5 MB");
+                throw new FileSizeExceedException($"File size must be under {_profilePictureConfig.MaxFileSizeInMB} MB");
             }
 
             // name changing

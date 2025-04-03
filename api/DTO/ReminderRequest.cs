@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using api.Enum;
 
 namespace api.DTO
 {
@@ -25,5 +26,8 @@ namespace api.DTO
 
         [Required( ErrorMessage = "Description is required" )]
         public String Description { get; set; } = String.Empty;
+
+        [Required( ErrorMessage = "Type is required")]
+        public ReminderType Type { get; set; }
     }
 }

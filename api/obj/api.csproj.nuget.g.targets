@@ -5,5 +5,6 @@
     <Import Project="$(NuGetPackageRoot)microsoft.extensions.options\9.0.0\buildTransitive\net8.0\Microsoft.Extensions.Options.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.extensions.options\9.0.0\buildTransitive\net8.0\Microsoft.Extensions.Options.targets')" />
     <Import Project="$(NuGetPackageRoot)microsoft.extensions.apidescription.server\6.0.3\build\Microsoft.Extensions.ApiDescription.Server.targets" Condition="Exists('$(NuGetPackageRoot)microsoft.extensions.apidescription.server\6.0.3\build\Microsoft.Extensions.ApiDescription.Server.targets')" />
     <Import Project="$(NuGetPackageRoot)nswag.aspnetcore\14.2.0\build\NSwag.AspNetCore.targets" Condition="Exists('$(NuGetPackageRoot)nswag.aspnetcore\14.2.0\build\NSwag.AspNetCore.targets')" />
+    <Import Project="$(NuGetPackageRoot)naudio.lame\2.1.0\build\NAudio.Lame.targets" Condition="Exists('$(NuGetPackageRoot)naudio.lame\2.1.0\build\NAudio.Lame.targets')" />
   </ImportGroup>
 </Project>

@@ -30,7 +30,9 @@ namespace api.DTO
         [Required( ErrorMessage = "Description is required" )]
         public String Description { get; set; } = String.Empty;
 
-        [Required( ErrorMessage = "Done status is required" )]
-        public IsDone IsDone { get; set; }
+        public IsDone? IsDone { get; set; }
+
+        [Required( ErrorMessage = "Type is required")]
+        public ReminderType Type { get; set; }
     }
 }

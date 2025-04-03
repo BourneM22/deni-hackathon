@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using api.DTO;
+using api.Models;
 using api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,11 +17,13 @@ namespace api.Controllers
     {
         private readonly ISoundbardService _soundbardService;
         private readonly IJwtService _jwtService;
+        private readonly ITextToSpeechService _textToSpeechService;
 
-        public SoundboardController(ISoundbardService soundbardService, IJwtService jwtService)
+        public SoundboardController(ISoundbardService soundbardService, IJwtService jwtService, ITextToSpeechService textToSpeechService)
         {
             _soundbardService = soundbardService;
             _jwtService = jwtService;
+            _textToSpeechService = textToSpeechService;
         }
 
         [HttpGet]
@@ -46,6 +49,23 @@ namespace api.Controllers
             String userId = _jwtService.GetUserIdFromToken(token);
 
             return Ok(await _soundbardService.GetAllSoundboardByFilterId(userId, filterId));
+        }
+
+        [HttpGet]
+        [Route("[action]/{soundboardId}")]
+        public async Task<IActionResult> GetSoundboardSoundById([FromRoute] String soundboardId)
+        {
+            String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
+            String userId = _jwtService.GetUserIdFromToken(token);
+
+            SoundboardResponse soundboard = await _soundbardService.GetSoundboardById(userId, soundboardId);
+
+            Audio audio = _textToSpeechService.TextToSpeech(soundboard.Description);
+
+            return new FileContentResult(audio.AudioBytes, audio.FileType)
+            {
+                FileDownloadName = audio.FileName
+            };
         }
 
         [HttpPost]

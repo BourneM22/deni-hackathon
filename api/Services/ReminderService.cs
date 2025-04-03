@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using api.DTO;
 using api.Enum;
 using api.Exceptions;
@@ -35,7 +31,7 @@ namespace api.Services
         {
             List<ReminderResponse> reminders = new List<ReminderResponse>();
 
-            String query = "select reminder_id, p.priority_id, p.name, title, deadline_date, start_time, end_time, description, is_done " +
+            String query = "select reminder_id, p.priority_id, p.name, title, deadline_date, start_time, end_time, description, is_done, type " +
                 "from REMINDER r " +
                 "join PRIORITY p on p.priority_id = r.priority_id " +
                 "where user_id = ?;";
@@ -59,7 +55,8 @@ namespace api.Services
                     StartTime = DateTime.Parse(reader["START_TIME"].ToString()!),
                     EndTime = DateTime.Parse(reader["END_TIME"].ToString()!),
                     Description = reader["DESCRIPTION"].ToString()!,
-                    IsDone = (IsDone) int.Parse(reader["IS_DONE"].ToString()!)
+                    IsDone = reader["IS_DONE"] == DBNull.Value ? null : (IsDone) int.Parse(reader["IS_DONE"].ToString()!),
+                    Type = (ReminderType) int.Parse(reader["TYPE"].ToString()!)
                 };
 
                 reminders.Add(reminder);
@@ -72,7 +69,7 @@ namespace api.Services
         {
             List<ReminderResponse> reminders = new List<ReminderResponse>();
 
-            String query = "select reminder_id, p.priority_id, p.name, title, deadline_date, start_time, end_time, description, is_done " +
+            String query = "select reminder_id, p.priority_id, p.name, title, deadline_date, start_time, end_time, description, is_done, type " +
                 "from REMINDER r " +
                 "join PRIORITY p on p.priority_id = r.priority_id " +
                 "where user_id = ? and deadline_date = ?";
@@ -97,7 +94,8 @@ namespace api.Services
                     StartTime = DateTime.Parse(reader["START_TIME"].ToString()!),
                     EndTime = DateTime.Parse(reader["END_TIME"].ToString()!),
                     Description = reader["DESCRIPTION"].ToString()!,
-                    IsDone = (IsDone) int.Parse(reader["IS_DONE"].ToString()!)
+                    IsDone = reader["IS_DONE"] == DBNull.Value ? null : (IsDone) int.Parse(reader["IS_DONE"].ToString()!),
+                    Type = (ReminderType) int.Parse(reader["TYPE"].ToString()!)
                 };
 
                 reminders.Add(reminder);
@@ -110,7 +108,7 @@ namespace api.Services
         {
             ReminderResponse? reminderResponse = null;
 
-            String query = "select reminder_id, p.priority_id, p.name, title, deadline_date, start_time, end_time, description, is_done " +
+            String query = "select reminder_id, p.priority_id, p.name, title, deadline_date, start_time, end_time, description, is_done, type " +
                 "from REMINDER r " +
                 "join PRIORITY p on p.priority_id = r.priority_id " +
                 "where user_id = ? and reminder_id = ?";
@@ -135,7 +133,8 @@ namespace api.Services
                     StartTime = DateTime.Parse(reader["START_TIME"].ToString()!),
                     EndTime = DateTime.Parse(reader["END_TIME"].ToString()!),
                     Description = reader["DESCRIPTION"].ToString()!,
-                    IsDone = (IsDone) int.Parse(reader["IS_DONE"].ToString()!)
+                    IsDone = reader["IS_DONE"] == DBNull.Value ? null : (IsDone) int.Parse(reader["IS_DONE"].ToString()!),
+                    Type = (ReminderType) int.Parse(reader["TYPE"].ToString()!)
                 };
 
                 reminderResponse = reminder;
@@ -158,8 +157,8 @@ namespace api.Services
                 throw new PriorityIdNotExistException();
             }
 
-            String query = "insert into REMINDER (reminder_id, user_id, priority_id, title, deadline_date, start_time, end_time, description, is_done) " +
-                "values (?, ?, ?, ?, ?, ?, ?, ?, ?) ";
+            String query = "insert into REMINDER (reminder_id, user_id, priority_id, title, deadline_date, start_time, end_time, description, is_done, type) " +
+                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ";
 
             using MySqlConnection conn = _dbConnection.GetConnection();
             using MySqlCommand cmd = new MySqlCommand(query, conn);
@@ -172,7 +171,8 @@ namespace api.Services
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Timestamp, Value = reminderRequest.StartTime });
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Timestamp, Value = reminderRequest.EndTime });
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = reminderRequest.Description });
-            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Int32, Value = 0 });
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Int32, Value = reminderRequest.Type.Equals(ReminderType.TASK) ? (object) IsDone.UNDONE : DBNull.Value });
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Int32, Value = reminderRequest.Type });
 
             int res = await cmd.ExecuteNonQueryAsync();
 
@@ -184,8 +184,16 @@ namespace api.Services
 
         public async Task UpdateReminder(UpdateReminderRequest updateReminderRequest, String userId)
         {
+            if (updateReminderRequest.Type.Equals(ReminderType.TASK) && updateReminderRequest.IsDone == null)
+            {
+                throw new DoneStatusCannotEmptyException();
+            } else if (updateReminderRequest.Type.Equals(ReminderType.REMINDER) && updateReminderRequest.IsDone != null)
+            {
+                updateReminderRequest.IsDone = null;
+            }
+
             String query = "update REMINDER " +
-                "set priority_id = ?, title = ?, deadline_date = ?, start_time = ?, end_time = ?, description = ?, is_done = ? " + 
+                "set priority_id = ?, title = ?, deadline_date = ?, start_time = ?, end_time = ?, description = ?, is_done = ?, type = ? " + 
                 "where reminder_id = ? and user_id = ?;";
 
             using MySqlConnection conn = _dbConnection.GetConnection();
@@ -197,7 +205,8 @@ namespace api.Services
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Timestamp, Value = updateReminderRequest.StartTime });
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Timestamp, Value = updateReminderRequest.EndTime });
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = updateReminderRequest.Description });
-            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Int32, Value = updateReminderRequest.IsDone });
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Int32, Value = (object?) updateReminderRequest.IsDone ?? DBNull.Value });
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Int32, Value = updateReminderRequest.Type });
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = updateReminderRequest.ReminderId });
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = userId });
         

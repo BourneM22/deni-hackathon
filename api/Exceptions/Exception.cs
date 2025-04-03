@@ -112,4 +112,13 @@ namespace api.Exceptions
 
         public SoundboardDoesNotExistException(string message, Exception inner) : base(message, inner) { }
     }
+
+    public class DoneStatusCannotEmptyException : Exception
+    {
+        public DoneStatusCannotEmptyException() { }
+
+        public DoneStatusCannotEmptyException(string message) : base(message) { }
+
+        public DoneStatusCannotEmptyException(string message, Exception inner) : base(message, inner) { }
+    }
 }

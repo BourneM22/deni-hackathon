@@ -103,4 +103,13 @@ namespace api.Exceptions
 
         public PriorityIdNotExistException(string message, Exception inner) : base(message, inner) { }
     }
+
+    public class SoundboardDoesNotExistException : Exception
+    {
+        public SoundboardDoesNotExistException() { }
+
+        public SoundboardDoesNotExistException(string message) : base(message) { }
+
+        public SoundboardDoesNotExistException(string message, Exception inner) : base(message, inner) { }
+    }
 }

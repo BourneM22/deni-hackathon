@@ -47,6 +47,7 @@ builder.Services.AddScoped<INoteService, NoteService>();
 builder.Services.AddScoped<IPriorityService, PriorityService>();
 builder.Services.AddScoped<IReminderService, ReminderService>();
 builder.Services.AddScoped<ISoundboardFilterService, SoundboardFilterService>();
+builder.Services.AddScoped<ISoundbardService, SoundboardService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IFileService, FileService>();

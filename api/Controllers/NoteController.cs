@@ -7,7 +7,7 @@ namespace api.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/notes")]
     public class NoteController : ControllerBase
     {
         private readonly INoteService _noteService;
@@ -20,32 +20,35 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        [Route("[action]")]
-        public async Task<IActionResult> GetNotes([FromQuery] String? noteId)
+        public async Task<IActionResult> GetAllNotes([FromQuery] String? tagId, [FromQuery] String? search)
         {
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
             String userId = _jwtService.GetUserIdFromToken(token);
 
-            if (!String.IsNullOrEmpty(noteId))
+            if (!String.IsNullOrEmpty(search))
             {
-                return Ok(await _noteService.GetNoteById(userId, noteId));
+                return Ok(await _noteService.SearchNoteByKeyword(userId, search));
+            }
+
+            if (!String.IsNullOrEmpty(tagId))
+            {
+                return Ok(await _noteService.GetAllNotesByTagId(userId, tagId));
             }
 
             return Ok(await _noteService.GetAllNotes(userId));
         }
 
         [HttpGet]
-        [Route("[action]/{noteTagId}")]
-        public async Task<IActionResult> GetAllNotesByTagId([FromRoute] String noteTagId)
+        [Route("{noteId}")]
+        public async Task<IActionResult> GetNoteById([FromRoute] String noteId)
         {
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
             String userId = _jwtService.GetUserIdFromToken(token);
 
-            return Ok(await _noteService.GetAllNotesByTagId(userId, noteTagId));
+            return Ok(await _noteService.GetNoteById(userId, noteId));
         }
 
         [HttpPost]
-        [Route("[action]")]
         public async Task<IActionResult> AddNewNote([FromBody] NoteRequest newNoteRequest)
         {
             if (!ModelState.IsValid)
@@ -62,12 +65,17 @@ namespace api.Controllers
         }
 
         [HttpPut]
-        [Route("[action]")]
-        public async Task<IActionResult> UpdateNote([FromBody] UpdateNoteRequest updateNoteRequest)
+        [Route("{noteId}")]
+        public async Task<IActionResult> UpdateNote([FromBody] UpdateNoteRequest updateNoteRequest, [FromRoute] String noteId)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            if (noteId != updateNoteRequest.NoteId)
+            {
+                return BadRequest();
             }
 
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
@@ -79,7 +87,7 @@ namespace api.Controllers
         }
 
         [HttpDelete]
-        [Route("[action]/{noteId}")]
+        [Route("{noteId}")]
         public async Task<IActionResult> DeleteNote([FromRoute] String noteId)
         {
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
@@ -88,16 +96,6 @@ namespace api.Controllers
             await _noteService.DeleteNote(noteId, userId);
             
             return Ok();
-        }
-
-        [HttpGet]
-        [Route("[action]")]
-        public async Task<IActionResult> SearchNotesByKeyword([FromQuery] String search)
-        {
-            String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
-            String userId = _jwtService.GetUserIdFromToken(token);
-
-            return Ok(await _noteService.SearchNoteByKeyword(userId, search));
         }
     }
 }

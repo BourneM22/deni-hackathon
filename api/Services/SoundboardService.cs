@@ -22,14 +22,23 @@ namespace api.Services
     public class SoundboardService : ISoundbardService
     {
         private readonly DbConnection _dbConnection;
+        private readonly ISoundboardFilterService _soundboardFilterService;
 
-        public SoundboardService(DbConnection dbConnection)
+        public SoundboardService(DbConnection dbConnection, ISoundboardFilterService soundboardFilterService)
         {
             _dbConnection = dbConnection;
+            _soundboardFilterService = soundboardFilterService;
         }
 
         public async Task AddNewSoundBoard(string userId, SoundboardRequest soundboardRequest)
         {
+            List<SoundboardFilterResponse> filters = await _soundboardFilterService.GetAllSounboardFilters(userId);
+
+            if (!filters.Any(f => f.FilterId == soundboardRequest.FilterId))
+            {
+                throw new FilterIdNotFoundException();
+            }
+
             String query = "insert into SOUNDBOARD (sound_id, user_id, filter_id, name, description) " +
                 "values (?, ?, ?, ?, ?);";
                 
@@ -171,6 +180,13 @@ namespace api.Services
 
         public async Task UpdateSoundboard(string userId, UpdateSoundboardRequest updateSoundboardRequest)
         {
+            List<SoundboardFilterResponse> filters = await _soundboardFilterService.GetAllSounboardFilters(userId);
+
+            if (!filters.Any(f => f.FilterId == updateSoundboardRequest.FilterId))
+            {
+                throw new FilterIdNotFoundException();
+            }
+
             String query = "update SOUNDBOARD " + 
                 "set filter_id = ?, name = ?, description = ? " + 
                 "where sound_id = ? and user_id = ?;";

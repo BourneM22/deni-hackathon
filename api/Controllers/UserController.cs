@@ -8,7 +8,7 @@ namespace api.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/user")]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -23,7 +23,6 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        [Route("[action]")]
         public async Task<IActionResult> GetUserInfo()
         {
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
@@ -31,8 +30,22 @@ namespace api.Controllers
             return Ok(await _userService.GetUserInfo(userId));
         }
 
+        [HttpGet]
+        [Route("profile-picture")]
+        public async Task<IActionResult> GetProfilePictureImg()
+        {
+            String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
+            String userId = _jwtService.GetUserIdFromToken(token);
+
+            ProfilePictureBytes profilePictureBytes = await _userService.GetProfilePictureByte(userId);
+
+            return new FileContentResult(profilePictureBytes.ImgBytes, "application/octet-stream")
+            {
+                FileDownloadName = profilePictureBytes.FileName
+            };
+        }
+
         [HttpPut]
-        [Route("[action]")]
         public async Task<IActionResult> UpdateUserInfo([FromBody] RegisterRequest registerRequest)
         {
             if (!ModelState.IsValid)
@@ -49,7 +62,7 @@ namespace api.Controllers
         }
 
         [HttpPut]
-        [Route("[action]")]
+        [Route("profile-picture")]
         public async Task<IActionResult> UpdateUserProfilePicture(IFormFile profilePicture)
         {
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
@@ -67,19 +80,16 @@ namespace api.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("[action]")]
-        public async Task<IActionResult> GetProfilePictureImg()
+        [HttpDelete]
+        [Route("profile-picture")]
+        public async Task<IActionResult> DeleteUserProfilePicture()
         {
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
             String userId = _jwtService.GetUserIdFromToken(token);
 
-            ProfilePictureBytes profilePictureBytes = await _userService.GetProfilePictureByte(userId);
+            await _userService.DeleteProfilePicture(userId);
 
-            return new FileContentResult(profilePictureBytes.ImgBytes, "application/octet-stream")
-            {
-                FileDownloadName = profilePictureBytes.FileName
-            };
+            return Ok();
         }
     }
 }

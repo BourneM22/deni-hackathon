@@ -22,16 +22,25 @@ namespace api.Services
         private readonly DbConnection _dbConnection;
         private readonly SearchingConfig _searchingConfig;
         private readonly ISearchingService _searchingService;
+        private readonly INoteTagService _noteTagService;
 
-        public NoteService(DbConnection dbConnection, IOptions<SearchingConfig> searchingConfig, ISearchingService searchingService)
+        public NoteService(DbConnection dbConnection, IOptions<SearchingConfig> searchingConfig, ISearchingService searchingService, INoteTagService noteTagService)
         {
             _dbConnection = dbConnection;
             _searchingConfig = searchingConfig.Value;
             _searchingService = searchingService;
+            _noteTagService = noteTagService;
         }
 
         public async Task AddNewNote(NoteRequest newNoteRequest, String userId)
         {
+            List<NoteTagResponse> tags = await _noteTagService.GetAllNoteTags(userId);
+
+            if (!tags.Any(t => t.TagId == newNoteRequest.TagId))
+            {
+                throw new TagIdNotFoundException();
+            }
+
             String query = "insert into NOTE (note_id, user_id, title, content, created_date_time, modified_date_time, tag_id) " +
                 "values (?, ?, ?, ?, ?, ?, ?);";
                 
@@ -51,6 +60,13 @@ namespace api.Services
 
         public async Task UpdateNote(UpdateNoteRequest updatedNote, String userId)
         {
+            List<NoteTagResponse> tags = await _noteTagService.GetAllNoteTags(userId);
+
+            if (!tags.Any(t => t.TagId == updatedNote.TagId))
+            {
+                throw new TagIdNotFoundException();
+            }
+
             String query = "update NOTE " +
                 "set title = ?, content = ?, modified_date_time = ?, tag_id = ? " + 
                 "where note_id = ? and user_id = ?;";
@@ -217,7 +233,7 @@ namespace api.Services
                 }
             }
 
-            results.Sort((a, b) => a.Item2.CompareTo(b.Item2));
+            results.Sort((a, b) => b.Item2.CompareTo(a.Item2));
 
             return results.Select(r => r.Item1).ToList();
         }

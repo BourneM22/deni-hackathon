@@ -2,13 +2,14 @@ using System.Speech.Synthesis;
 using api.DTO;
 using api.Enum;
 using api.Exceptions;
+using api.Models;
 using api.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
@@ -21,7 +22,7 @@ namespace api.Controllers
         }
 
         [HttpPost]
-        [Route("[action]")]
+        [Route("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
             if (!ModelState.IsValid)
@@ -42,7 +43,7 @@ namespace api.Controllers
         }
 
         [HttpPost]
-        [Route("[action]")]
+        [Route("signin")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest registerRequest)
         {
             if (!ModelState.IsValid)
@@ -60,6 +61,18 @@ namespace api.Controllers
             {
                 return BadRequest(e.Message);
             }
+        }
+
+        [HttpPost]
+        [Route("validate/email")]
+        public async Task<IActionResult> CheckExistingEmail([FromBody] Email email)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            return Ok(await _authService.CheckEmailAlreadyExist(email.Name));
         }
     }
 }

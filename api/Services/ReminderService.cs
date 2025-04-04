@@ -10,9 +10,10 @@ namespace api.Services
     {
         Task<List<ReminderResponse>> GetAllReminders(string userId);
         Task<List<ReminderResponse>> GetSpecificDateReminders(String userId, DateOnly date);
+        Task<List<ReminderResponse>> GetSpecificMonthYearReminders(String userId, DateOnly monthYear);
         Task<ReminderResponse> GetReminderById(String reminderId, String userId);
-        Task AddNewReminder(String userId, ReminderRequest reminderRequest);
-        Task UpdateReminder(UpdateReminderRequest updateReminderRequest, String userId);
+        Task AddNewReminder(String userId, ParsedReminderRequest reminderRequest);
+        Task UpdateReminder(ParsedUpdateReminderRequest updateReminderRequest, String userId);
         Task DeleteReminder(String userId, String reminderId);
     }
 
@@ -53,7 +54,7 @@ namespace api.Services
                     Title = reader["TITLE"].ToString()!,
                     DeadlineDate = DateOnly.FromDateTime(DateTime.Parse(reader["DEADLINE_DATE"].ToString()!)),
                     StartTime = DateTime.Parse(reader["START_TIME"].ToString()!),
-                    EndTime = DateTime.Parse(reader["END_TIME"].ToString()!),
+                    EndTime = reader["END_TIME"] == DBNull.Value ? null : DateTime.Parse(reader["END_TIME"].ToString()!),
                     Description = reader["DESCRIPTION"].ToString()!,
                     IsDone = reader["IS_DONE"] == DBNull.Value ? null : (IsDone) int.Parse(reader["IS_DONE"].ToString()!),
                     Type = (ReminderType) int.Parse(reader["TYPE"].ToString()!)
@@ -62,7 +63,7 @@ namespace api.Services
                 reminders.Add(reminder);
             }
 
-            return reminders.OrderBy(r => r.IsDone).ThenByDescending(r => r.PriorityId).ThenBy(r => r.DeadlineDate).ToList();
+            return reminders.OrderBy(r => r.IsDone).ThenBy(r => r.DeadlineDate).ThenByDescending(r => r.PriorityId).ToList();
         }
 
         public async Task<List<ReminderResponse>> GetSpecificDateReminders(String userId, DateOnly date)
@@ -92,7 +93,7 @@ namespace api.Services
                     Title = reader["TITLE"].ToString()!,
                     DeadlineDate = DateOnly.FromDateTime(DateTime.Parse(reader["DEADLINE_DATE"].ToString()!)),
                     StartTime = DateTime.Parse(reader["START_TIME"].ToString()!),
-                    EndTime = DateTime.Parse(reader["END_TIME"].ToString()!),
+                    EndTime = reader["END_TIME"] == DBNull.Value ? null : DateTime.Parse(reader["END_TIME"].ToString()!),
                     Description = reader["DESCRIPTION"].ToString()!,
                     IsDone = reader["IS_DONE"] == DBNull.Value ? null : (IsDone) int.Parse(reader["IS_DONE"].ToString()!),
                     Type = (ReminderType) int.Parse(reader["TYPE"].ToString()!)
@@ -101,7 +102,47 @@ namespace api.Services
                 reminders.Add(reminder);
             }
 
-            return reminders.OrderBy(r => r.IsDone).ThenByDescending(r => r.PriorityId).ThenBy(r => r.DeadlineDate).ToList();
+            return reminders.OrderBy(r => r.IsDone).ThenBy(r => r.DeadlineDate).ThenByDescending(r => r.PriorityId).ToList();
+        }
+
+        public async Task<List<ReminderResponse>> GetSpecificMonthYearReminders(String userId, DateOnly monthYear)
+        {
+            List<ReminderResponse> reminders = new List<ReminderResponse>();
+
+            String query = "select reminder_id, p.priority_id, p.name, title, deadline_date, start_time, end_time, description, is_done, type " +
+                "from REMINDER r " +
+                "join PRIORITY p on p.priority_id = r.priority_id " +
+                "where user_id = ? and MONTH(deadline_date) = ? and YEAR(deadline_date) = ?;";
+
+            using MySqlConnection conn = _dbConnection.GetConnection();
+            using MySqlCommand cmd = new MySqlCommand(query, conn);
+
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = userId });
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Int32, Value = monthYear.Month });
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Int32, Value = monthYear.Year });
+
+            using var reader = await cmd.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                ReminderResponse reminder = new ReminderResponse()
+                {
+                    ReminderId = reader["REMINDER_ID"].ToString()!,
+                    PriorityId = int.Parse(reader["PRIORITY_ID"].ToString()!),
+                    PriorityName = reader["NAME"].ToString()!,
+                    Title = reader["TITLE"].ToString()!,
+                    DeadlineDate = DateOnly.FromDateTime(DateTime.Parse(reader["DEADLINE_DATE"].ToString()!)),
+                    StartTime = DateTime.Parse(reader["START_TIME"].ToString()!),
+                    EndTime = reader["END_TIME"] == DBNull.Value ? null : DateTime.Parse(reader["END_TIME"].ToString()!),
+                    Description = reader["DESCRIPTION"].ToString()!,
+                    IsDone = reader["IS_DONE"] == DBNull.Value ? null : (IsDone) int.Parse(reader["IS_DONE"].ToString()!),
+                    Type = (ReminderType) int.Parse(reader["TYPE"].ToString()!)
+                };
+
+                reminders.Add(reminder);
+            }
+
+            return reminders.OrderBy(r => r.IsDone).ThenBy(r => r.DeadlineDate).ThenByDescending(r => r.PriorityId).ToList();
         }
 
         public async Task<ReminderResponse> GetReminderById(String reminderId, String userId)
@@ -131,7 +172,7 @@ namespace api.Services
                     Title = reader["TITLE"].ToString()!,
                     DeadlineDate = DateOnly.FromDateTime(DateTime.Parse(reader["DEADLINE_DATE"].ToString()!)),
                     StartTime = DateTime.Parse(reader["START_TIME"].ToString()!),
-                    EndTime = DateTime.Parse(reader["END_TIME"].ToString()!),
+                    EndTime = reader["END_TIME"] == DBNull.Value ? null : DateTime.Parse(reader["END_TIME"].ToString()!),
                     Description = reader["DESCRIPTION"].ToString()!,
                     IsDone = reader["IS_DONE"] == DBNull.Value ? null : (IsDone) int.Parse(reader["IS_DONE"].ToString()!),
                     Type = (ReminderType) int.Parse(reader["TYPE"].ToString()!)
@@ -148,13 +189,18 @@ namespace api.Services
             return reminderResponse;
         }
 
-        public async Task AddNewReminder(String userId, ReminderRequest reminderRequest)
+        public async Task AddNewReminder(String userId, ParsedReminderRequest reminderRequest)
         {
             List<Priority> priorities = _priorityService.GetAllPriorities();
 
             if (!priorities.Any(p => p.PriorityId == reminderRequest.PriorityId))
             {
                 throw new PriorityIdNotExistException();
+            }
+
+            if (reminderRequest.EndTime != null && reminderRequest.StartTime >= reminderRequest.EndTime)
+            {
+                throw new StartTimeExceedEndTimeException();
             }
 
             String query = "insert into REMINDER (reminder_id, user_id, priority_id, title, deadline_date, start_time, end_time, description, is_done, type) " +
@@ -169,7 +215,7 @@ namespace api.Services
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = reminderRequest.Title });
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Timestamp, Value = reminderRequest.DeadlineDate });
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Timestamp, Value = reminderRequest.StartTime });
-            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Timestamp, Value = reminderRequest.EndTime });
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Timestamp, Value = (object?) reminderRequest.EndTime ?? DBNull.Value });
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = reminderRequest.Description });
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Int32, Value = reminderRequest.Type.Equals(ReminderType.TASK) ? (object) IsDone.UNDONE : DBNull.Value });
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Int32, Value = reminderRequest.Type });
@@ -182,7 +228,7 @@ namespace api.Services
             }
         }
 
-        public async Task UpdateReminder(UpdateReminderRequest updateReminderRequest, String userId)
+        public async Task UpdateReminder(ParsedUpdateReminderRequest updateReminderRequest, String userId)
         {
             if (updateReminderRequest.Type.Equals(ReminderType.TASK) && updateReminderRequest.IsDone == null)
             {
@@ -190,6 +236,11 @@ namespace api.Services
             } else if (updateReminderRequest.Type.Equals(ReminderType.REMINDER) && updateReminderRequest.IsDone != null)
             {
                 updateReminderRequest.IsDone = null;
+            }
+
+            if (updateReminderRequest.EndTime != null && updateReminderRequest.StartTime >= updateReminderRequest.EndTime)
+            {
+                throw new StartTimeExceedEndTimeException();
             }
 
             String query = "update REMINDER " +
@@ -203,7 +254,7 @@ namespace api.Services
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = updateReminderRequest.Title });
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Timestamp, Value = updateReminderRequest.DeadlineDate });
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Timestamp, Value = updateReminderRequest.StartTime });
-            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Timestamp, Value = updateReminderRequest.EndTime });
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Timestamp, Value = (object?) updateReminderRequest.EndTime ?? DBNull.Value });
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = updateReminderRequest.Description });
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Int32, Value = (object?) updateReminderRequest.IsDone ?? DBNull.Value });
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Int32, Value = updateReminderRequest.Type });

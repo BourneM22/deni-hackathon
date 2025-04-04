@@ -6,11 +6,10 @@ using api.Enum;
 
 namespace api.DTO
 {
-    public class ReminderResponse
+    public class ParsedUpdateReminderRequest
     {
         public String ReminderId { get; set; } = String.Empty;
         public int PriorityId { get; set; }
-        public String PriorityName { get; set; } = String.Empty;
         public String Title { get; set; } = String.Empty;
         public DateOnly DeadlineDate { get; set; }
         public DateTime StartTime { get; set; }

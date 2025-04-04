@@ -121,4 +121,31 @@ namespace api.Exceptions
 
         public DoneStatusCannotEmptyException(string message, Exception inner) : base(message, inner) { }
     }
+
+    public class StartTimeExceedEndTimeException : Exception
+    {
+        public StartTimeExceedEndTimeException() { }
+
+        public StartTimeExceedEndTimeException(string message) : base(message) { }
+
+        public StartTimeExceedEndTimeException(string message, Exception inner) : base(message, inner) { }
+    }
+
+    public class FilterIdNotFoundException : Exception
+    {
+        public FilterIdNotFoundException() { }
+
+        public FilterIdNotFoundException(string message) : base(message) { }
+
+        public FilterIdNotFoundException(string message, Exception inner) : base(message, inner) { }
+    }
+
+    public class TagIdNotFoundException : Exception
+    {
+        public TagIdNotFoundException() { }
+
+        public TagIdNotFoundException(string message) : base(message) { }
+
+        public TagIdNotFoundException(string message, Exception inner) : base(message, inner) { }
+    }
 }

@@ -7,7 +7,7 @@ namespace api.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/note-tags")]
     public class NoteTagController : ControllerBase
     {
         private readonly INoteTagService _noteTagService;
@@ -20,7 +20,6 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        [Route("[action]")]
         public async Task<IActionResult> GetAllNoteTags()
         {
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
@@ -30,7 +29,6 @@ namespace api.Controllers
         }
 
         [HttpPost]
-        [Route("[action]")]
         public async Task<IActionResult> AddNewNoteTag([FromBody] NoteTagRequest noteTagRequest)
         {
             if (!ModelState.IsValid)
@@ -47,12 +45,17 @@ namespace api.Controllers
         }
 
         [HttpPut]
-        [Route("[action]")]
-        public async Task<IActionResult> UpdateNoteTag([FromBody] UpdateNoteTagRequest updateNoteTagRequest)
+        [Route("{noteTagId}")]
+        public async Task<IActionResult> UpdateNoteTag([FromBody] UpdateNoteTagRequest updateNoteTagRequest, [FromRoute] String noteTagId)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            if (noteTagId != updateNoteTagRequest.TagId)
+            {
+                return BadRequest();
             }
 
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
@@ -64,7 +67,7 @@ namespace api.Controllers
         }
 
         [HttpDelete]
-        [Route("[action]/{noteTagId}")]
+        [Route("{noteTagId}")]
         public async Task<IActionResult> DeleteNoteTag([FromRoute] String noteTagId)
         {
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;

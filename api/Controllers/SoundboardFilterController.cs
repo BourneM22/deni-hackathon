@@ -11,7 +11,7 @@ namespace api.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/soundboard-filters")]
     public class SoundboardFilterController : ControllerBase
     {
         private readonly ISoundboardFilterService _soundboardFilterService;
@@ -24,7 +24,6 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        [Route("[action]")]
         public async Task<IActionResult> GetAllSoundboardFilters()
         {
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
@@ -34,7 +33,6 @@ namespace api.Controllers
         }
 
         [HttpPost]
-        [Route("[action]")]
         public async Task<IActionResult> AddNewSoundboardFilter([FromBody] SoundboardFilterRequest soundboardFilterRequest)
         {
             if (!ModelState.IsValid)
@@ -51,12 +49,17 @@ namespace api.Controllers
         }
 
         [HttpPut]
-        [Route("[action]")]
-        public async Task<IActionResult> UpdateSoundboardFilter([FromBody] UpdateSoundboardFilterRequest updateSoundboardFilterRequest)
+        [Route("{soundboardFilterId}")]
+        public async Task<IActionResult> UpdateSoundboardFilter([FromBody] UpdateSoundboardFilterRequest updateSoundboardFilterRequest, [FromRoute] String soundboardFilterId)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            if (soundboardFilterId != updateSoundboardFilterRequest.FilterId)
+            {
+                return BadRequest();
             }
 
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
@@ -68,7 +71,7 @@ namespace api.Controllers
         }
 
         [HttpDelete]
-        [Route("[action]/{soundboardFilterId}")]
+        [Route("{soundboardFilterId}")]
         public async Task<IActionResult> DeleteSoundboardFilter([FromRoute] String soundboardFilterId)
         {
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;

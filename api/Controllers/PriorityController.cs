@@ -1,3 +1,4 @@
+using api.DTO;
 using api.Models;
 using api.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -7,7 +8,7 @@ namespace api.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/priorities")]
     public class PriorityController : ControllerBase
     {
         private readonly IPriorityService _priorityService;
@@ -20,19 +21,23 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        [Route("[action]")]
         public IActionResult GetAllPriorities()
         {
             return Ok(_priorityService.GetAllPriorities());
         }
 
         [HttpPut]
-        [Route("[action]")]
-        public async Task<IActionResult> UpdatePriority([FromBody] Priority updatedPriority)
+        [Route("{priorityId}")]
+        public async Task<IActionResult> UpdatePriority([FromBody] UpdatePriorityRequest updatePriorityRequest, [FromRoute] int priorityId)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            if (priorityId != updatePriorityRequest.PriorityId)
+            {
+                return BadRequest();
             }
 
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
@@ -40,7 +45,7 @@ namespace api.Controllers
 
             try
             {
-                await _priorityService.UpdatePriority(updatedPriority, userId);
+                await _priorityService.UpdatePriority(updatePriorityRequest, userId);
 
                 return Ok();
             } catch
@@ -50,7 +55,6 @@ namespace api.Controllers
         }
 
         [HttpPost]
-        [Route("[action]")]
         public async Task<IActionResult> AddNewPriority([FromBody] Priority newPriority)
         {
             if (!ModelState.IsValid)
@@ -73,7 +77,7 @@ namespace api.Controllers
         }
 
         [HttpDelete]
-        [Route("[action]/{priorityId}")]
+        [Route("{priorityId}")]
         public async Task<IActionResult> DeletePriority([FromRoute] int priorityId)
         {
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;

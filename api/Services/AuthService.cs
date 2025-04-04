@@ -11,6 +11,7 @@ namespace api.Services
     {
         Task<LoginResponse> Authenticate(LoginRequest request);
         Task Register(RegisterRequest registerRequest);
+        Task<bool> CheckEmailAlreadyExist(String email);
     }
 
     public class AuthService : IAuthService

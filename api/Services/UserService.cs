@@ -13,6 +13,7 @@ namespace api.Services
         Task UpdateProfilePicturePath(String newProfilePicturePath, String userId);
         Task<ProfilePictureBytes> GetProfilePictureByte(String userId);
         Task<Boolean> CheckIsAdmin(String userId);
+        Task DeleteProfilePicture(String userId);
     }
     public class UserService : IUserService
     {
@@ -80,6 +81,11 @@ namespace api.Services
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = userId });
 
             int res = await cmd.ExecuteNonQueryAsync();
+
+            if (res == 0)
+            {
+                throw new Exception();
+            }
         }
 
         public async Task UpdateProfilePicturePath(String newProfilePicturePath, String userId)
@@ -95,6 +101,11 @@ namespace api.Services
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = userId });
 
             int res = await cmd.ExecuteNonQueryAsync();
+
+            if (res == 0)
+            {
+                throw new Exception();
+            }
         }
 
         public async Task<ProfilePictureBytes> GetProfilePictureByte(String userId)
@@ -137,6 +148,26 @@ namespace api.Services
             };
         }
 
+        public async Task DeleteProfilePicture(String userId)
+        {
+            String query = "update USER " +
+                "set profile_picture_path = ? " + 
+                "where user_id = ?;";
+
+            using var conn = _dbConnection.GetConnection();
+            using var cmd = new MySqlCommand(query, conn);
+
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = DBNull.Value });
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = userId });
+
+            int res = await cmd.ExecuteNonQueryAsync();
+
+            if (res == 0)
+            {
+                throw new Exception();
+            }
+        }
+
         public async Task<bool> CheckIsAdmin(string userId)
         {
             int? response = null;
@@ -162,7 +193,7 @@ namespace api.Services
                 throw new UserNotFoundException();
             }
 
-            if (IsAdmin.ADMIN.Equals(response))
+            if (IsAdmin.ADMIN.Equals((IsAdmin) response))
             {
                 return true;
             }

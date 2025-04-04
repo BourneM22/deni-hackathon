@@ -8,7 +8,7 @@ namespace api.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/reminders")]
     public class ReminderController : ControllerBase
     {
         private readonly IReminderService _reminderService;
@@ -21,20 +21,40 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        [Route("[action]")]
-        public async Task<IActionResult> GetReminders([FromQuery] String? reminderId, [FromQuery] IsDone? isDone)
+        public async Task<IActionResult> GetAllReminders([FromQuery] IsDone? isDone, [FromQuery] String? date, [FromQuery] String? monthYear)
         {
             List<ReminderResponse> reminders = new List<ReminderResponse>();
 
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
             String userId = _jwtService.GetUserIdFromToken(token);
 
-            if (!String.IsNullOrEmpty(reminderId))
+            if (!String.IsNullOrEmpty(date))
             {
-                return Ok(await _reminderService.GetReminderById(reminderId, userId));
-            }
+                try
+                {
+                    DateTime parsedDate = DateTime.Parse(date);
 
-            reminders = await _reminderService.GetAllReminders(userId);
+                    reminders = await _reminderService.GetSpecificDateReminders(userId,  DateOnly.FromDateTime(parsedDate));
+                } catch
+                {
+                    return BadRequest("Date format must be yyyy-mm-dd");
+                }
+            } else if (!String.IsNullOrEmpty(monthYear))
+            {
+                try
+                {
+                    monthYear = $"{monthYear}-01";
+                    DateTime parsedMonthYear = DateTime.Parse(monthYear);
+
+                    reminders = await _reminderService.GetSpecificMonthYearReminders(userId,  DateOnly.FromDateTime(parsedMonthYear));
+                } catch
+                {
+                    return BadRequest("Date format must be yyyy-mm");
+                }
+            } else
+            {
+                reminders = await _reminderService.GetAllReminders(userId);
+            }
 
             if (isDone.Equals(IsDone.UNDONE))
             {
@@ -50,75 +70,106 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        [Route("[action]")]
-        public async Task<IActionResult> GetRemindersByDate([FromQuery] String? date, [FromQuery] IsDone? isDone)
+        [Route("{reminderId}")]
+        public async Task<IActionResult> GetAllReminders([FromRoute] String reminderId)
         {
-            DateTime parsedDate = DateTime.Now;
             List<ReminderResponse> reminders = new List<ReminderResponse>();
 
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
             String userId = _jwtService.GetUserIdFromToken(token);
 
-            if (date == null)
-            {
-                reminders = await _reminderService.GetSpecificDateReminders(userId, DateOnly.FromDateTime(DateTime.Today));
-            } else
-            {
-                try
-                {
-                    parsedDate = DateTime.Parse(date);
-
-                    reminders = await _reminderService.GetSpecificDateReminders(userId,  DateOnly.FromDateTime(parsedDate));
-                } catch
-                {
-                    return BadRequest("Date format must be yyyy-mm-dd");
-                }
-            }
-
-            if (isDone.Equals(IsDone.UNDONE))
-            {
-                reminders = reminders.Where(r => r.IsDone.Equals(IsDone.UNDONE)).ToList();
-            }
-
-            if (isDone.Equals(IsDone.DONE))
-            {
-                reminders = reminders.Where(r => r.IsDone.Equals(IsDone.DONE)).ToList();
-            }
-
-            return Ok(reminders);
+            return Ok(await _reminderService.GetReminderById(reminderId, userId));
         }
 
         [HttpPost]
-        [Route("[action]")]
         public async Task<IActionResult> AddNewReminder([FromBody] ReminderRequest reminderRequest)
         {
+            DateTime? startTime, endTime = null;
+
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
             String userId = _jwtService.GetUserIdFromToken(token);
 
-            await _reminderService.AddNewReminder(userId, reminderRequest);
+            try
+            {
+                startTime = DateTime.Parse(reminderRequest.DeadlineDate.ToString("yyyy-MM-dd") + $" {reminderRequest.StartTime}:00");
+
+                if (reminderRequest.EndTime != null)
+                {
+                    endTime = DateTime.Parse(reminderRequest.DeadlineDate.ToString("yyyy-MM-dd") + $" {reminderRequest.EndTime}:00");
+                }
+            } catch
+            {
+                return BadRequest("Start time and end time must be in format hh:mm! (24 hour format)");
+            }
+
+            ParsedReminderRequest parsedReminderRequest = new ParsedReminderRequest()
+            {
+                DeadlineDate = reminderRequest.DeadlineDate,
+                Description = reminderRequest.Description,
+                EndTime = endTime,
+                StartTime = (DateTime)startTime,
+                PriorityId = reminderRequest.PriorityId,
+                Title = reminderRequest.Title,
+                Type = reminderRequest.Type
+            };
+
+            await _reminderService.AddNewReminder(userId, parsedReminderRequest);
 
             return Ok();
         }
 
         [HttpPut]
-        [Route("[action]")]
-        public async Task<IActionResult> UpdateReminder([FromBody] UpdateReminderRequest updateReminderRequest)
+        [Route("{reminderId}")]
+        public async Task<IActionResult> UpdateReminder([FromBody] UpdateReminderRequest updateReminderRequest, [FromRoute] String reminderId)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
+            if (reminderId != updateReminderRequest.ReminderId)
+            {
+                return BadRequest();
+            }
+
+            DateTime? startTime, endTime = null;
+
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
             String userId = _jwtService.GetUserIdFromToken(token);
 
-            await _reminderService.UpdateReminder(updateReminderRequest, userId);
+            try
+            {
+                startTime = DateTime.Parse(updateReminderRequest.DeadlineDate.ToString("yyyy-MM-dd") + $" {updateReminderRequest.StartTime}:00");
+                
+                if (updateReminderRequest.EndTime != null)
+                {
+                    endTime = DateTime.Parse(updateReminderRequest.DeadlineDate.ToString("yyyy-MM-dd") + $" {updateReminderRequest.EndTime}:00");
+                }
+            } catch
+            {
+                return BadRequest("Start time and end time must be in format hh:mm! (24 hour format)");
+            }
+
+            ParsedUpdateReminderRequest parsedUpdateReminderRequest = new ParsedUpdateReminderRequest()
+            {
+                ReminderId = updateReminderRequest.ReminderId,
+                IsDone = updateReminderRequest.IsDone,
+                DeadlineDate = updateReminderRequest.DeadlineDate,
+                Description = updateReminderRequest.Description,
+                EndTime = endTime,
+                StartTime = (DateTime)startTime,
+                PriorityId = updateReminderRequest.PriorityId,
+                Title = updateReminderRequest.Title,
+                Type = updateReminderRequest.Type
+            };
+
+            await _reminderService.UpdateReminder(parsedUpdateReminderRequest, userId);
 
             return Ok();
         }
 
         [HttpDelete]
-        [Route("[action]/{reminderId}")]
+        [Route("{reminderId}")]
         public async Task<IActionResult> DeleteReminder([FromRoute] String reminderId)
         {
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;

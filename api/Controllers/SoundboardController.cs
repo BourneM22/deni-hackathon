@@ -12,7 +12,7 @@ namespace api.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/soundboards")]
     public class SoundboardController : ControllerBase
     {
         private readonly ISoundbardService _soundbardService;
@@ -27,33 +27,32 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        [Route("[action]")]
-        public async Task<IActionResult> GetSoundboards([FromQuery] String? soundboardId)
+        public async Task<IActionResult> GetAllSoundboards([FromQuery] String? filterId)
         {
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
             String userId = _jwtService.GetUserIdFromToken(token);
 
-            if (soundboardId != null)
+            if (!String.IsNullOrEmpty(filterId))
             {
-                return Ok(await _soundbardService.GetSoundboardById(userId, soundboardId));
+                return Ok(await _soundbardService.GetAllSoundboardByFilterId(userId, filterId));
             }
 
             return Ok(await _soundbardService.GetAllSoundboard(userId));
         }
 
         [HttpGet]
-        [Route("[action]/{filterId}")]
-        public async Task<IActionResult> GetAllSoundboardsByFilterID([FromRoute] String filterId)
+        [Route("{soundboardId}")]
+        public async Task<IActionResult> GetSoundboardById([FromRoute] String soundboardId)
         {
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
             String userId = _jwtService.GetUserIdFromToken(token);
 
-            return Ok(await _soundbardService.GetAllSoundboardByFilterId(userId, filterId));
+            return Ok(await _soundbardService.GetSoundboardById(userId, soundboardId));
         }
 
         [HttpGet]
-        [Route("[action]/{soundboardId}")]
-        public async Task<IActionResult> GetSoundboardSoundById([FromRoute] String soundboardId)
+        [Route("{soundboardId}/audio")]
+        public async Task<IActionResult> GetSoundboardAudioById([FromRoute] String soundboardId)
         {
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
             String userId = _jwtService.GetUserIdFromToken(token);
@@ -69,7 +68,6 @@ namespace api.Controllers
         }
 
         [HttpPost]
-        [Route("[action]")]
         public async Task<IActionResult> AddNewSoundboard([FromBody] SoundboardRequest soundboardRequest)
         {
             if (!ModelState.IsValid)
@@ -86,12 +84,17 @@ namespace api.Controllers
         }
 
         [HttpPut]
-        [Route("[action]")]
-        public async Task<IActionResult> UpdateSoundboard([FromBody] UpdateSoundboardRequest updateSoundboardRequest)
+        [Route("{soundboardId}")]
+        public async Task<IActionResult> UpdateSoundboard([FromBody] UpdateSoundboardRequest updateSoundboardRequest, [FromRoute] String soundboardId)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            if (soundboardId != updateSoundboardRequest.SoundId)
+            {
+                return BadRequest();
             }
 
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
@@ -103,7 +106,7 @@ namespace api.Controllers
         }
 
         [HttpDelete]
-        [Route("[action]/{soundboardId}")]
+        [Route("{soundboardId}")]
         public async Task<IActionResult> DeleteSoundboard([FromRoute] String soundboardId)
         {
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;

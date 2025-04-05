@@ -72,7 +72,7 @@ namespace api.Controllers
                 return BadRequest(ModelState);
             }
 
-            return Ok(await _authService.CheckEmailAlreadyExist(email.Name));
+            return Ok(await _authService.CheckEmailAlreadyExist(email.EmailAddress));
         }
     }
 }

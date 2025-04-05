@@ -10,6 +10,6 @@ namespace api.Models
     {
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Email format is invalid")]
-        public String Name { get; set; } = String.Empty;
+        public String EmailAddress { get; set; } = String.Empty;
     }
 }

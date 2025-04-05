@@ -35,12 +35,14 @@ builder.Services.AddOpenApiDocument(options =>
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.Configure<MySqlModel>(builder.Configuration.GetSection("MySql"));
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
 builder.Services.Configure<FileConfig>(builder.Configuration.GetSection("FileConfig"));
 builder.Services.Configure<ProfilePictureConfig>(builder.Configuration.GetSection("ProfilePictureConfig"));
 builder.Services.Configure<SearchingConfig>(builder.Configuration.GetSection("SearchingConfig"));
+builder.Services.Configure<ChatBotConfig>(builder.Configuration.GetSection("ChatBotConfig"));
 
 builder.Services.AddTransient<DbConnection>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -51,6 +53,7 @@ builder.Services.AddScoped<IPriorityService, PriorityService>();
 builder.Services.AddScoped<IReminderService, ReminderService>();
 builder.Services.AddScoped<ISoundboardFilterService, SoundboardFilterService>();
 builder.Services.AddScoped<ISoundbardService, SoundboardService>();
+builder.Services.AddScoped<IChatBotService, ChatBotService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IFileService, FileService>();

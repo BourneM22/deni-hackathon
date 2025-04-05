@@ -1147,7 +1147,7 @@
           }
         }
       },
-      "System.Text.Json/9.0.0": {
+      "System.Text.Json/9.0.3": {
         "type": "package",
         "compile": {
           "lib/net9.0/System.Text.Json.dll": {
@@ -3287,10 +3287,10 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "System.Text.Json/9.0.0": {
-      "sha512": "js7+qAu/9mQvnhA4EfGMZNEzXtJCDxgkgj8ohuxq/Qxv+R56G+ljefhiJHOxTNiw54q8vmABCWUwkMulNdlZ4A==",
+    "System.Text.Json/9.0.3": {
+      "sha512": "r2JRkLjsYrq5Dpo7+y3Wa73OfirZPdVhxiTJWwZ+oJM7FOAe0LkM3GlH+pgkNRdd1G1kwUbmRCdmh4uoaWwu1g==",
       "type": "package",
-      "path": "system.text.json/9.0.0",
+      "path": "system.text.json/9.0.3",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -3353,7 +3353,7 @@
         "lib/net9.0/System.Text.Json.xml",
         "lib/netstandard2.0/System.Text.Json.dll",
         "lib/netstandard2.0/System.Text.Json.xml",
-        "system.text.json.9.0.0.nupkg.sha512",
+        "system.text.json.9.0.3.nupkg.sha512",
         "system.text.json.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -3544,7 +3544,8 @@
       "NAudio.Lame >= 2.1.0",
       "NSwag.AspNetCore >= 14.2.0",
       "Swashbuckle.AspNetCore.SwaggerUI >= 8.0.0",
-      "System.Speech >= 9.0.3"
+      "System.Speech >= 9.0.3",
+      "System.Text.Json >= 9.0.3"
     ]
   },
   "packageFolders": {
@@ -3627,6 +3628,10 @@
             "version": "[8.0.0, )"
           },
           "System.Speech": {
+            "target": "Package",
+            "version": "[9.0.3, )"
+          },
+          "System.Text.Json": {
             "target": "Package",
             "version": "[9.0.3, )"
           }

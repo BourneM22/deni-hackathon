@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
 {
-    // [Authorize]
+    [Authorize]
     [ApiController]
     [Route("api/chatbot")]
     public class ChatBotController : ControllerBase

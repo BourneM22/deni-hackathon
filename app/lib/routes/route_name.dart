@@ -2,6 +2,6 @@ abstract class AuthRoute {
   static const welcome = '/welcome';
 }
 
-abstract class HomeRoute {
-  static const dashboard = '/home/dashboard';
+abstract class MainRoute {
+  static const main = '/main';
 }

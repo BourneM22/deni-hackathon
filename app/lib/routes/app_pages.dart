@@ -1,4 +1,5 @@
 import 'package:deni_hackathon/screens/auth/welcome/welcome_screen.dart';
+import 'package:deni_hackathon/screens/main/main_screen.dart';
 import 'package:get/get.dart';
 import 'route_name.dart';
 
@@ -7,13 +8,13 @@ class AppPages {
     /* Auth */
     GetPage(
       name: AuthRoute.welcome,
-      page: () => WelcomeScreen(),
+      page: () => const WelcomeScreen(),
     ),
 
-    /* Home */
-    // GetPage(
-    //   name: HomeRoute.dashboard,
-    //   page: () => const MainNavigationScreen(),
-    // ),
+    /* Main */
+    GetPage(
+      name: MainRoute.main,
+      page: () => const MainScreen(),
+    ),
   ];
 }

@@ -1,5 +1,7 @@
+import 'package:deni_hackathon/routes/route_name.dart';
 import 'package:flutter/material.dart';
-import 'screens/auth/welcome/welcome_screen.dart';
+import 'package:get/get.dart';
+import 'routes/app_pages.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,9 +13,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const WelcomeScreen(),
+      title: 'Deni Hackathon',
+      initialRoute: AuthRoute.welcome,
+      getPages: AppPages.pages,  
     );
   }
 }

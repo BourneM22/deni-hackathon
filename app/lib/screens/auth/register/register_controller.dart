@@ -1,5 +1,7 @@
+import 'package:deni_hackathon/routes/route_name.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 
 
 class RegisterController extends GetxController {
@@ -10,7 +12,7 @@ class RegisterController extends GetxController {
   final emailTFController = TextEditingController();
   final passwordTFController = TextEditingController();
   var birthDate = Rxn<DateTime>();
-  
+
   @override
   void onInit() {
     super.onInit();
@@ -21,4 +23,8 @@ class RegisterController extends GetxController {
     super.dispose();
   }
 
+
+  Future<void> register() async {
+    Get.toNamed(MainRoute.main);
+  }
 }

@@ -328,7 +328,9 @@ class RegisterDialog extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          controller.register();
+                        },
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,

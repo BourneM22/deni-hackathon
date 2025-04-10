@@ -38,12 +38,12 @@ namespace api.Services
                 "from USER " +
                 "where email = ?;";
 
-            using MySqlConnection conn = _dbConnection.GetConnection();
-            using MySqlCommand cmd = new MySqlCommand(query, conn);
+            using MySqlConnection conn1 = _dbConnection.GetConnection();
+            using MySqlCommand cmd1 = new MySqlCommand(query, conn1);
 
-            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = request.Email });
+            cmd1.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = request.Email });
 
-            using var reader = await cmd.ExecuteReaderAsync();
+            using var reader = await cmd1.ExecuteReaderAsync();
 
             if (await reader.ReadAsync())
             {
@@ -59,6 +59,23 @@ namespace api.Services
             if (!_passwordHasher.Verify(hashedPassword, request.Password))
             {
                 throw new PasswordNotMatchException();
+            }
+
+            query = "update USER " +
+                "set last_login = ? " +
+                "where user_id = ?;";
+
+            using MySqlConnection conn2 = _dbConnection.GetConnection();
+            using MySqlCommand cmd2 = new MySqlCommand(query, conn2);
+
+            cmd2.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Timestamp, Value = DateTime.Now });
+            cmd2.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = userId });
+
+            int res = await cmd2.ExecuteNonQueryAsync();
+
+            if (res == 0)
+            {
+                throw new Exception();
             }
 
             return new LoginResponse()
@@ -88,7 +105,7 @@ namespace api.Services
                 IsAdmin = IsAdmin.USER
             };
 
-            String query = "insert into USER (user_id, email, birth_date, created_date_time, gender, name, password, admin) " +
+            String query = "insert into USER (user_id, email, birth_date, created_date_time, gender, name, password, is_admin) " +
                 "values (?, ?, ?, ?, ?, ?, ?, ?);";
 
             using MySqlConnection conn = _dbConnection.GetConnection();
@@ -101,9 +118,14 @@ namespace api.Services
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = newUser.Gender });
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = newUser.Name });
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = newUser.Password });
-            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = newUser.IsAdmin });
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Int32, Value = newUser.IsAdmin });
 
             int res = await cmd.ExecuteNonQueryAsync();
+
+            if (res == 0)
+            {
+                throw new Exception();
+            }
         }
 
         public async Task<bool> CheckEmailAlreadyExist(String email)

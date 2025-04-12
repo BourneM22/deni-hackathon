@@ -2,6 +2,8 @@ import 'package:deni_hackathon/screens/main/vision/vision_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../constants/colors_constants.dart';
+
 class VisionScreen extends StatelessWidget {
   const VisionScreen({super.key});
 
@@ -11,7 +13,9 @@ class VisionScreen extends StatelessWidget {
       init: VisionController(),
       builder: (VisionController controller) {
         return Scaffold(
+          backgroundColor: ColorsConstants.baseColor,
           appBar: AppBar(
+            backgroundColor: ColorsConstants.baseColor,
             title: const Text('Vision Screen'),
           ),
           body: Center(

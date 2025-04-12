@@ -10,16 +10,16 @@ class LoginResponse {
   });
 
   LoginResponse.fromJson(Map<String, dynamic> json) {
-    tokenType = json['token_type'] ?? '';
-    accessToken = json['access_token'] ?? '';
-    expiresInMinutes = json['expires_in_minutes'] ?? 0;
+    tokenType = json['tokenType'] ?? '';
+    accessToken = json['accessToken'] ?? '';
+    expiresInMinutes = json['expiresInMinutes'] ?? 0;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['token_type'] = tokenType;
-    data['access_token'] = accessToken;
-    data['expires_in_minutes'] = expiresInMinutes;
+    data['tokenType'] = tokenType;
+    data['accessToken'] = accessToken;
+    data['expiresInMinutes'] = expiresInMinutes;
     return data;
   }
 }

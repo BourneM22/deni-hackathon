@@ -1,4 +1,7 @@
+import 'package:deni_hackathon/constants/colors_constants.dart';
 import 'package:flutter/material.dart';
+
+import '../../../widgets/deni_style.dart';
 
 class CalendarScreen extends StatelessWidget {
   const CalendarScreen({super.key});
@@ -6,43 +9,12 @@ class CalendarScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: ColorsConstants.baseColor,
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-        title: const Text(
-          'Soundboard',
-          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-        ),
+        backgroundColor: ColorsConstants.baseColor,
+        title: const Text('Calendar Screen'),
       ),
-      body: Column(
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Hello I'm Bourne!\nWhat's your name?",
-                style: TextStyle(fontSize: 16),
-              ),
-            ),
-          ),
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.only(top: 8),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+      body: Center(child: Text('This is the Calendar Screen')),
     );
   }
 }

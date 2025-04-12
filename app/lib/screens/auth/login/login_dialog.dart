@@ -1,5 +1,4 @@
 import 'package:deni_hackathon/constants/colors_constants.dart';
-import 'package:deni_hackathon/screens/auth/forgot-password/forgot_password_dialog.dart';
 import 'package:deni_hackathon/screens/auth/login/login_controller.dart';
 import 'package:deni_hackathon/widgets/deni_style.dart';
 import 'package:flutter/material.dart';
@@ -142,54 +141,16 @@ class LoginDialog extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          controller.login();
+                        },
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           TextButton(
                             onPressed: () {
-                              Navigator.pop(context);
-                              showGeneralDialog(
-                                context: context,
-                                barrierDismissible: true,
-                                barrierLabel:
-                                    MaterialLocalizations.of(
-                                      context,
-                                    ).modalBarrierDismissLabel,
-                                barrierColor: Colors.black54,
-                                transitionDuration: const Duration(
-                                  milliseconds: 300,
-                                ),
-                                pageBuilder: (
-                                  context,
-                                  animation,
-                                  secondaryAnimation,
-                                ) {
-                                  return ForgotPasswordDialog();
-                                },
-                                transitionBuilder: (
-                                  context,
-                                  animation,
-                                  secondaryAnimation,
-                                  child,
-                                ) {
-                                  const begin = Offset(0.0, 1.0);
-                                  const end = Offset(0.0, 0.0);
-                                  const curve = Curves.easeInOut;
-
-                                  var tween = Tween(
-                                    begin: begin,
-                                    end: end,
-                                  ).chain(CurveTween(curve: curve));
-                                  var offsetAnimation = animation.drive(tween);
-
-                                  return SlideTransition(
-                                    position: offsetAnimation,
-                                    child: child,
-                                  );
-                                },
-                              );
+                              controller.closeAndShowModal(context);
                             },
                             child: Row(
                               children: [

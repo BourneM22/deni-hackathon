@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 
 
-class SoundboardController extends GetxController {
+class CalendarController extends GetxController {
   
   @override
   void onInit() {

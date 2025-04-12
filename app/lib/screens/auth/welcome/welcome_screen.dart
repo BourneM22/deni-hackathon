@@ -171,9 +171,8 @@ class WelcomeScreen extends StatelessWidget {
           msg: 'Login with Google canceled.',
           toastLength: Toast.LENGTH_LONG,
           gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
           backgroundColor: ColorsConstants.blackToastColor,
-        textColor: ColorsConstants.trueWhiteColor,
+          textColor: ColorsConstants.trueWhiteColor,
           fontSize: 12.0,
         );
       }
@@ -184,7 +183,6 @@ class WelcomeScreen extends StatelessWidget {
         msg: 'Failed to login with Google. Please try again.',
         toastLength: Toast.LENGTH_LONG,
         gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
         backgroundColor: ColorsConstants.blackToastColor,
         textColor: ColorsConstants.trueWhiteColor,
         fontSize: 12.0,

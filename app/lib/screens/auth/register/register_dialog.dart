@@ -1,5 +1,4 @@
 import 'package:deni_hackathon/constants/colors_constants.dart';
-import 'package:deni_hackathon/screens/auth/login/login_dialog.dart';
 import 'package:deni_hackathon/screens/auth/register/register_controller.dart';
 import 'package:deni_hackathon/widgets/deni_style.dart';
 import 'package:flutter/material.dart';
@@ -131,7 +130,9 @@ class RegisterDialog extends StatelessWidget {
                             child: Text('Female'),
                           ),
                         ],
-                        onChanged: (value) {},
+                        onChanged: (value) {
+                          controller.gender = value.toString();
+                        },
                       ),
                       SizedBox(height: 10),
                       Text(
@@ -337,47 +338,8 @@ class RegisterDialog extends StatelessWidget {
                         children: [
                           TextButton(
                             onPressed: () {
-                              Navigator.pop(context);
-                              showGeneralDialog(
-                                context: context,
-                                barrierDismissible: true,
-                                barrierLabel:
-                                    MaterialLocalizations.of(
-                                      context,
-                                    ).modalBarrierDismissLabel,
-                                barrierColor: Colors.black54,
-                                transitionDuration: const Duration(
-                                  milliseconds: 300,
-                                ),
-                                pageBuilder: (
-                                  context,
-                                  animation,
-                                  secondaryAnimation,
-                                ) {
-                                  return LoginDialog();
-                                },
-                                transitionBuilder: (
-                                  context,
-                                  animation,
-                                  secondaryAnimation,
-                                  child,
-                                ) {
-                                  const begin = Offset(0.0, 1.0);
-                                  const end = Offset(0.0, 0.0);
-                                  const curve = Curves.easeInOut;
-
-                                  var tween = Tween(
-                                    begin: begin,
-                                    end: end,
-                                  ).chain(CurveTween(curve: curve));
-                                  var offsetAnimation = animation.drive(tween);
-
-                                  return SlideTransition(
-                                    position: offsetAnimation,
-                                    child: child,
-                                  );
-                                },
-                              );
+                              controller.closeAndShowModal(context);
+                              
                             },
                             child: Row(
                               children: [

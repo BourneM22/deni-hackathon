@@ -35,6 +35,32 @@ class HomeScreen extends StatelessWidget {
               child: Icon(Icons.person_outline, color: Colors.black),
             ),
           ),
+          floatingActionButton: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFF6C2727),
+                  Color(0xFF000000),
+                ],
+              ),
+            ),
+            child: FloatingActionButton(
+              onPressed: () {
+                controller.createSoundboard();
+              },
+              backgroundColor:
+                  Colors.transparent,
+              elevation: 0,
+              child: const Icon(
+                Icons.add,
+                color: ColorsConstants.trueWhiteColor,
+              ),
+            ),
+          ),
+          floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
           body: RefreshIndicator(
             onRefresh: () async {
               controller.onInit();
@@ -45,6 +71,7 @@ class HomeScreen extends StatelessWidget {
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.4,
                   child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
                     controller: controller.scrollController,
                     child: Padding(
                       padding: EdgeInsets.all(16.0),

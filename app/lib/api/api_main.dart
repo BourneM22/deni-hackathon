@@ -19,9 +19,9 @@ class ApiMain {
 
   Future<bool> createSoundboard(Map<String, dynamic> data) async {
     try {
-      final jsonResponse = await apiService.requestPost('$baseUrl/soundboards', data);
+      await apiService.requestPost('$baseUrl/soundboards', data);
 
-      return jsonResponse['success'] as bool;
+      return true;
     } catch (e) {
       throw Exception('Failed to create soundboard: $e');
     }

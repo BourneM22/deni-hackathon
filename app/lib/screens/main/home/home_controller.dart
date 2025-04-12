@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 
 import '../../../api-response/soundboard_get_response.dart';
 import '../../../api/api_main.dart';
+import '../../../constants/colors_constants.dart';
 import '../../../utils/logger.dart';
+import '../../../widgets/deni_style.dart';
 import '../main_controller.dart';
 
 class HomeController extends GetxController {
@@ -48,31 +51,191 @@ class HomeController extends GetxController {
   }
 
   Future<void> createSoundboard() async {
+    final TextEditingController nameController = TextEditingController();
+    final TextEditingController descriptionController = TextEditingController();
+
+    showGeneralDialog(
+      context: Get.context!,
+      barrierDismissible: true,
+      barrierLabel: "Dismiss",
+      barrierColor: Colors.black.withOpacity(0.4), // dim background
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Align(
+          alignment: Alignment.bottomCenter,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Material(
+              borderRadius: BorderRadius.circular(12),
+              color: ColorsConstants.baseColor,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: TextFormField(
+                        controller: nameController,
+                        style: deniStyle(
+                          fontSize: 20,
+                          fontFamily: 'Afacad',
+                          fontWeight: FontWeight.bold,
+                          color: ColorsConstants.darkGreyColor,
+                        ),
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Enter label...',
+                          hintStyle: deniStyle(
+                            fontSize: 20,
+                            fontFamily: 'Afacad',
+                            color: ColorsConstants.mediumGreyColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const Divider(color: Colors.grey, thickness: 1),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: TextFormField(
+                        controller: descriptionController,
+                        maxLines: 3,
+                        style: deniStyle(
+                          fontSize: 16,
+                          fontFamily: 'Afacad',
+                          color: ColorsConstants.darkGreyColor,
+                        ),
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          fillColor: ColorsConstants.whiteColor,
+                          filled: true,
+                          hintText: 'Enter content...',
+                          hintStyle: deniStyle(
+                            fontSize: 16,
+                            fontFamily: 'Afacad',
+                            color: ColorsConstants.mediumGreyColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 16.0),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: ColorsConstants.lightRedColor,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(8),
+                                  ),
+                                ),
+                              ),
+                              onPressed: () => Navigator.pop(context),
+                              child: Text(
+                                'Cancel',
+                                style: deniStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'Afacad',
+                                  color: ColorsConstants.redColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 16.0),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    ColorsConstants.lightGreenColor,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(8),
+                                  ),
+                                ),
+                              ),
+                              onPressed: () async {
+                                await onCreateSoundboard(
+                                  nameController.text,
+                                  descriptionController.text,
+                                );
+                              },
+                              child: Text(
+                                'Save',
+                                style: deniStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'Afacad',
+                                  color: ColorsConstants.greenColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, 1),
+            end: Offset.zero,
+          ).animate(
+            CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+          ),
+          child: FadeTransition(
+            opacity: CurvedAnimation(parent: animation, curve: Curves.easeIn),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> onCreateSoundboard(String name, String description) async {
     try {
-      final data = {
-        'name': 'New Soundboard',
-        'description': 'This is a new soundboard',
-      };
-
-      final response = await apiMain.createSoundboard(data);
-
-      if (response) {
-        getSoundboard();
-      } else {
-        isError = true;
-        update();
-      }
+      final data = {'name': name, 'description': description};
+      await apiMain.createSoundboard(data);
+      Fluttertoast.showToast(
+        msg: "Soundboard updated successfully!",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: ColorsConstants.blackToastColor,
+        textColor: ColorsConstants.trueWhiteColor,
+        fontSize: 12.0,
+      );
+      Navigator.pop(Get.context!);
+      getSoundboard();
+      Get.find<MainController>().exitEditMode();
     } catch (e) {
-      isError = true;
-      update();
-    } finally {
-      isLoading = false;
-      update();
+      log.e(e);
+      Fluttertoast.showToast(
+        msg: "Failed to update soundboard!",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: ColorsConstants.blackToastColor,
+        textColor: ColorsConstants.trueWhiteColor,
+        fontSize: 12.0,
+      );
     }
   }
 
   void initChatList() {
-    chatList.add(Chat(message: "Hello I'm Bourne!\nWhat's your name?", isUser: false));
+    chatList = [];
+    chatList.add(
+      Chat(message: "Hello I'm Bourne!\nWhat's your name?", isUser: false),
+    );
     update();
   }
 

@@ -12,6 +12,8 @@ namespace api.Services
         Task<LoginResponse> Authenticate(LoginRequest request);
         Task Register(RegisterRequest registerRequest);
         Task<bool> CheckEmailAlreadyExist(String email);
+        Task SetNewPassword(String password, String email);
+        Task ResetPassword(String email);
     }
 
     public class AuthService : IAuthService
@@ -20,13 +22,15 @@ namespace api.Services
         private readonly IPasswordHasher _passwordHasher;
         private readonly IJwtService _jwtService;
         private readonly JwtConfig _jwtConfig;
+        private readonly IEmailService _emailService;
 
-        public AuthService(DbConnection dbConnection, IPasswordHasher passwordHasher, IJwtService jwtService, IOptions<JwtConfig> jwtConfig)
+        public AuthService(DbConnection dbConnection, IPasswordHasher passwordHasher, IJwtService jwtService, IOptions<JwtConfig> jwtConfig, IEmailService emailService)
         {
             _dbConnection = dbConnection;
             _passwordHasher = passwordHasher;
             _jwtService = jwtService;
             _jwtConfig = jwtConfig.Value;
+            _emailService = emailService;
         }
 
         public async Task<LoginResponse> Authenticate(LoginRequest request)
@@ -147,6 +151,42 @@ namespace api.Services
             }
 
             return false;
+        }
+
+        public async Task SetNewPassword(String password, String email)
+        {
+            String query = "update USER " +
+                "set password = ? " + 
+                "where email = ?;";
+
+            using MySqlConnection conn = _dbConnection.GetConnection();
+            using MySqlCommand cmd = new MySqlCommand(query, conn);
+
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = _passwordHasher.Hash(password) });
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = email });
+
+            int res = await cmd.ExecuteNonQueryAsync();
+
+            if (res == 0)
+            {
+                throw new Exception();
+            }
+        }
+
+        public async Task ResetPassword(string email)
+        {
+            String newPassword = GenerateRandomString(10);
+
+            await SetNewPassword(newPassword, email);
+            await _emailService.SendEmail(email, "Your Deni app password has been reset!", $"Your new Deni password: {newPassword}");
+        }
+
+        public string GenerateRandomString(int length = 10)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var random = new Random();
+            return new string(Enumerable.Repeat(chars, length)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
         }
     }
 }

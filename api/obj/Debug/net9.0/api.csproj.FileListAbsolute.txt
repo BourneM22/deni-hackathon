@@ -96,3 +96,5 @@ D:\Coding\deni-hackathon\api\bin\Debug\net9.0\Grpc.Net.Client.dll
 D:\Coding\deni-hackathon\api\bin\Debug\net9.0\Grpc.Net.ClientFactory.dll
 D:\Coding\deni-hackathon\api\bin\Debug\net9.0\Grpc.Net.Common.dll
 D:\Coding\deni-hackathon\api\bin\Debug\net9.0\Vosk.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\MailKit.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\MimeKit.dll

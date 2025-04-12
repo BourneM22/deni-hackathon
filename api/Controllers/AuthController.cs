@@ -74,5 +74,19 @@ namespace api.Controllers
 
             return Ok(await _authService.CheckEmailAlreadyExist(email.EmailAddress));
         }
+
+        [HttpPost]
+        [Route("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] Email email)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            await _authService.ResetPassword(email.EmailAddress);
+
+            return Ok(new {Message = $"New password has been send into {email.EmailAddress}"});
+        }
     }
 }

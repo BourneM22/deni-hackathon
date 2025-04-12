@@ -85,3 +85,14 @@ D:\Coding\deni-hackathon\api\bin\Debug\net9.0\NAudio.Midi.dll
 D:\Coding\deni-hackathon\api\bin\Debug\net9.0\NAudio.Wasapi.dll
 D:\Coding\deni-hackathon\api\bin\Debug\net9.0\NAudio.WinMM.dll
 D:\Coding\deni-hackathon\api\bin\Debug\net9.0\MathNet.Numerics.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\libgcc_s_seh-1.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\libstdc++-6.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\libvosk.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\libwinpthread-1.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\Grpc.AspNetCore.Server.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\Grpc.AspNetCore.Server.ClientFactory.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\Grpc.Core.Api.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\Grpc.Net.Client.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\Grpc.Net.ClientFactory.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\Grpc.Net.Common.dll
+D:\Coding\deni-hackathon\api\bin\Debug\net9.0\Vosk.dll

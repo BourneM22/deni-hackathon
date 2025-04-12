@@ -1,3 +1,5 @@
+flask
+requests
 langchain
 langchain-ollama
 langchain-chroma

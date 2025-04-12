@@ -8,7 +8,7 @@ namespace api.Services
 {
     public interface IChatBotService
     {
-        Task<ChatBotResponse> AskChatBot(ChatBotRequest chatBotRequest);
+        Task<ChatBotResponse> AskChatBot(ChatBotRequest chatBotRequest, String jwtToken, String userId);
     }
 
     public class ChatBotService : IChatBotService
@@ -24,61 +24,42 @@ namespace api.Services
             _chatBotUrl = $"http://{_chatBotConfig.Url}:{_chatBotConfig.Port}";
         }
 
-        public async Task<ChatBotResponse> AskChatBot(ChatBotRequest chatBotRequest)
+        public async Task<ChatBotResponse> AskChatBot(ChatBotRequest chatBotRequest, String jwtToken, String userId)
         {
-            JsonSerializerOptions options = new JsonSerializerOptions
+            var requestPayload = new
             {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase // This ensures the first letter is lowercase
+                prompt = chatBotRequest.Prompt,
+                token = jwtToken,
+                userId = userId
             };
 
-            String jsonPostBodyRequest = JsonSerializer.Serialize(chatBotRequest, options);
-            StringContent content = new StringContent(jsonPostBodyRequest, Encoding.UTF8, "application/json");
-
-            HttpResponseMessage response = await _httpClient.PostAsync(_chatBotUrl + "/chatbot", content);
-            String responseContent = string.Empty;
-
-            if (response.IsSuccessStatusCode)
+            var options = new JsonSerializerOptions
             {
-                responseContent = await response.Content.ReadAsStringAsync();
-                // Console.WriteLine("Raw response: " + responseContent);  // Log the raw response content
-            }
-            else
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
+            var json = JsonSerializer.Serialize(requestPayload, options);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync($"{_chatBotUrl}/chatbot", content);
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
             {
-                string errorContent = await response.Content.ReadAsStringAsync();
-                throw new Exception($"Error: {response.StatusCode} - {errorContent}");
+                throw new Exception($"Error: {response.StatusCode} - {responseContent}");
             }
 
-            try
+            var deserializationOptions = new JsonSerializerOptions
             {
-                // Deserialize the response content with added options
-                options = new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                    AllowTrailingCommas = true,  // Allow trailing commas
-                    ReadCommentHandling = JsonCommentHandling.Skip
-                };
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                AllowTrailingCommas = true,
+                ReadCommentHandling = JsonCommentHandling.Skip
+            };
 
-                // Deserialize JSON content
-                ChatBotResponse? botResponse = JsonSerializer.Deserialize<ChatBotResponse>(responseContent, options);
+            var botResponse = JsonSerializer.Deserialize<ChatBotResponse>(responseContent, deserializationOptions)
+                            ?? throw new Exception("Failed to deserialize the response.");
 
-                // Check if deserialization was successful
-                if (botResponse == null)
-                {
-                    throw new Exception("Failed to deserialize the response.");
-                }
-
-                String[] responseArray = botResponse.Response.Split("\n\n").Skip(1).ToArray();
-                botResponse.Response = String.Join("\n\n", responseArray);
-
-                // Console.WriteLine($"Deserialized response: {botResponse.Response}");
-                return botResponse;
-            }
-            catch (JsonException)
-            {
-                // Console.WriteLine($"Deserialization failed: {ex.Message}");
-                // Console.WriteLine($"Raw response content: {responseContent}");
-                throw;
-            }
+            return botResponse;
         }
     }
 }

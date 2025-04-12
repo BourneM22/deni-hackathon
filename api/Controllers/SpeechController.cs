@@ -10,6 +10,7 @@ using Vosk;
 
 namespace api.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/speech")]
     public class SpeechController : ControllerBase

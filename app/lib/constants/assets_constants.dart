@@ -9,4 +9,7 @@ class AssetConstants {
   static const String calendarIcon = 'assets/icons/calendar.svg';
   static const String visionIcon = 'assets/icons/vision.svg';
   static const String notesIcon = 'assets/icons/notes.svg';
+  static const String editIcon = 'assets/icons/edit.svg';
+  static const String deleteIcon = 'assets/icons/delete.svg';
+  static const String moveIcon = 'assets/icons/move.svg';
 }

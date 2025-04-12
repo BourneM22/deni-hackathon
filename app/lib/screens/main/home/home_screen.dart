@@ -38,18 +38,59 @@ class HomeScreen extends StatelessWidget {
           body: RefreshIndicator(
             onRefresh: () async {
               controller.onInit();
-
             },
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.4,
-                  child: Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Text(
-                      "Hello I'm Bourne!\nWhat's your name?",
-                      style: deniStyle(fontSize: 16),
+                  child: SingleChildScrollView(
+                    controller: controller.scrollController,
+                    child: Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Column(
+                        children:
+                            controller.chatList.map((chat) {
+                              return Row(
+                                mainAxisAlignment:
+                                    chat.isUser == true
+                                        ? MainAxisAlignment.end
+                                        : MainAxisAlignment.start,
+                                children: [
+                                  Flexible(
+                                    child: Container(
+                                      margin: const EdgeInsets.only(bottom: 8),
+                                      padding:
+                                          chat.isUser == true
+                                              ? EdgeInsets.symmetric(
+                                                vertical: 8,
+                                                horizontal: 16,
+                                              )
+                                              : EdgeInsets.zero,
+                                      decoration: BoxDecoration(
+                                        color:
+                                            chat.isUser == true
+                                                ? ColorsConstants.darkGreyColor
+                                                : ColorsConstants.baseColor,
+                                        borderRadius: BorderRadius.circular(24),
+                                      ),
+                                      child: Text(
+                                        chat.message!,
+                                        style: deniStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color:
+                                              chat.isUser == true
+                                                  ? ColorsConstants.whiteColor
+                                                  : ColorsConstants
+                                                      .darkGreyColor,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }).toList(),
+                      ),
                     ),
                   ),
                 ),
@@ -79,57 +120,88 @@ class HomeScreen extends StatelessWidget {
                                   color: ColorsConstants.darkerWhiteColor,
                                   borderRadius: BorderRadius.circular(20),
                                 ),
-                                child: const Text('All'),
+                                child: Row(
+                                  children: [
+                                    Text('All'),
+                                    Icon(
+                                      Icons.arrow_drop_down,
+                                      color: ColorsConstants.darkGreyColor,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        Divider(
+                          color: ColorsConstants.darkGreyColor,
+                          thickness: 1.0,
+                        ),
                         Expanded(
-                          child: controller.isLoading
-                              ? const Center(
-                                  child: CircularProgressIndicator(),
-                                )
-                              :
-                           GridView.builder(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  crossAxisSpacing: 8,
-                                  mainAxisSpacing: 8,
-                                  childAspectRatio: 2,
-                                ),
-                            itemCount: controller.soundboardList.length,
-                            itemBuilder: (context, index) {
-                              final soundboard = controller.soundboardList[index];
-                              return Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: ColorsConstants.darkerWhiteColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      soundboard.name!,
-                                      style: deniStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                          child:
+                              controller.isLoading
+                                  ? const Center(
+                                    child: CircularProgressIndicator(),
+                                  )
+                                  : GridView.builder(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
                                     ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      soundboard.description!,
-                                      style: deniStyle(fontSize: 12),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
+                                    gridDelegate:
+                                        const SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: 2,
+                                          crossAxisSpacing: 8,
+                                          mainAxisSpacing: 8,
+                                          childAspectRatio: 2,
+                                        ),
+                                    itemCount: controller.soundboardList.length,
+                                    itemBuilder: (context, index) {
+                                      final soundboard =
+                                          controller.soundboardList[index];
+                                      return InkWell(
+                                        onTap: () {
+                                          controller.onClickSoundboard(
+                                            soundboard,
+                                          );
+                                        },
+                                        onLongPress: () {
+                                          controller.onLongPressSoundboard(
+                                            soundboard,
+                                          );
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color:
+                                                ColorsConstants
+                                                    .darkerWhiteColor,
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                soundboard.name!,
+                                                style: deniStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                soundboard.description!,
+                                                style: deniStyle(fontSize: 12),
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
                         ),
                       ],
                     ),
@@ -139,7 +211,7 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
         );
-      }
+      },
     );
   }
 }

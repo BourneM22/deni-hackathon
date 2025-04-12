@@ -142,7 +142,7 @@ class LoginDialog extends StatelessWidget {
                                   'Login',
                                   style: TextStyle(
                                     fontSize: 16,
-                                    color: ColorsConstants.trueWhiteColor,
+                                    color: ColorsConstants.primaryColor,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),

@@ -19,7 +19,7 @@ class MainScreen extends StatelessWidget {
     return GetBuilder<MainController>(
       init: MainController(),
       builder: (MainController controller) {
-        var content;
+        StatelessWidget content;
         if (controller.currentBottomNavIndex == 0) {
           content = const HomeScreen();
         } else if (controller.currentBottomNavIndex == 1) {
@@ -34,27 +34,124 @@ class MainScreen extends StatelessWidget {
         return Scaffold(
           backgroundColor: Colors.white,
           body: content,
-          bottomNavigationBar: BottomAppBar(
-            shape: CircularNotchedRectangle(),
-            notchMargin: 8,
-            color: ColorsConstants.whiteColor,
-            height: 90,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                _buildNavItem(controller, AssetConstants.homeIcon, "Home", 0),
-                _buildNavItem(controller, AssetConstants.calendarIcon, "Calendar", 1),
-                GestureDetector(
-                  onTap: () => (),
-                  child: Image.asset(
-                    AssetConstants.emergencyButton,
+          bottomNavigationBar:
+              controller.isEditMode == true
+                  ? BottomAppBar(
+                    color: ColorsConstants.whiteColor,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            controller.editSoundboard();
+                          },
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SvgPicture.asset(
+                                AssetConstants.editIcon,
+                                color: ColorsConstants.mediumGreyColor,
+                                height: 24,
+                              ),
+                              Text(
+                                'Edit',
+                                style: deniStyle(
+                                  fontSize: 14,
+                                  fontFamily: 'Afacad',
+                                  color: ColorsConstants.mediumGreyColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            controller.moveSoundboard();
+                          },
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SvgPicture.asset(
+                                AssetConstants.moveIcon,
+                                color: ColorsConstants.mediumGreyColor,
+                                height: 24,
+                              ),
+                              Text(
+                                'Move',
+                                style: deniStyle(
+                                  fontSize: 14,
+                                  fontFamily: 'Afacad',
+                                  color: ColorsConstants.mediumGreyColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            controller.deleteSoundboard(context);
+                          },
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SvgPicture.asset(
+                                AssetConstants.deleteIcon,
+                                color: ColorsConstants.mediumGreyColor,
+                                height: 24,
+                              ),
+                              Text(
+                                'Delete',
+                                style: deniStyle(
+                                  fontSize: 14,
+                                  fontFamily: 'Afacad',
+                                  color: ColorsConstants.mediumGreyColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                  : BottomAppBar(
+                    shape: CircularNotchedRectangle(),
+                    notchMargin: 8,
+                    color: ColorsConstants.whiteColor,
+                    height: 90,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        _buildNavItem(
+                          controller,
+                          AssetConstants.homeIcon,
+                          "Home",
+                          0,
+                        ),
+                        _buildNavItem(
+                          controller,
+                          AssetConstants.calendarIcon,
+                          "Calendar",
+                          1,
+                        ),
+                        GestureDetector(
+                          onTap: () => (),
+                          child: Image.asset(AssetConstants.emergencyButton),
+                        ),
+                        _buildNavItem(
+                          controller,
+                          AssetConstants.visionIcon,
+                          "Vision",
+                          2,
+                        ),
+                        _buildNavItem(
+                          controller,
+                          AssetConstants.notesIcon,
+                          "Notes",
+                          3,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                _buildNavItem(controller, AssetConstants.visionIcon, "Vision", 2),
-                _buildNavItem(controller, AssetConstants.notesIcon, "Notes", 3),
-              ],
-            ),
-          ),
         );
       },
     );
@@ -76,7 +173,10 @@ class MainScreen extends StatelessWidget {
           children: [
             SvgPicture.asset(
               iconPath,
-              color: isSelected ? ColorsConstants.darkerPrimaryColor : ColorsConstants.mediumGreyColor,
+              color:
+                  isSelected
+                      ? ColorsConstants.darkerPrimaryColor
+                      : ColorsConstants.mediumGreyColor,
               height: 24,
             ),
             Text(
@@ -84,7 +184,10 @@ class MainScreen extends StatelessWidget {
               style: deniStyle(
                 fontSize: 14,
                 fontFamily: 'Afacad',
-                color: isSelected ? ColorsConstants.darkerPrimaryColor : ColorsConstants.mediumGreyColor,
+                color:
+                    isSelected
+                        ? ColorsConstants.darkerPrimaryColor
+                        : ColorsConstants.mediumGreyColor,
               ),
             ),
           ],

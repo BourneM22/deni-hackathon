@@ -72,10 +72,11 @@ public class SpeechToTextService : ISpeechToTextService
 
     public async Task<SpeechToTextResponse> ProcessAudioFile(IFormFile file)
     {
-        try
-        {
-            var inputPath = Path.GetTempFileName(); // Temp file for uploaded audio
-            var outputPath = Path.ChangeExtension(inputPath, ".pcm"); // Temp file for PCM conversion
+        // try
+        // {
+            var tempId = Guid.NewGuid().ToString();
+            var inputPath = Path.Combine(Path.GetTempPath(), $"{tempId}.input");
+            var outputPath = Path.Combine(Path.GetTempPath(), $"{tempId}.pcm");
 
             // Save the uploaded file to a temporary location
             using (var fileStream = new FileStream(inputPath, FileMode.Create, FileAccess.Write, FileShare.None))
@@ -104,9 +105,22 @@ public class SpeechToTextService : ISpeechToTextService
                 CreateNoWindow = true
             };
 
-            using (var process = Process.Start(startInfo))
+            using (var process = new Process { StartInfo = startInfo })
             {
-                process!.WaitForExit(); // Wait until FFmpeg finishes processing
+                process.Start();
+
+                // Important: read these to avoid deadlocks and ensure FFmpeg flushes all its output
+                var stdOutTask = process.StandardOutput.ReadToEndAsync();
+                var stdErrTask = process.StandardError.ReadToEndAsync();
+
+                await Task.WhenAll(stdOutTask, stdErrTask); // Wait for both to finish
+
+                await process.WaitForExitAsync(); // Make sure the process ends fully
+
+                if (process.ExitCode != 0)
+                {
+                    throw new Exception($"FFmpeg failed (Exit Code {process.ExitCode}): {stdErrTask.Result}");
+                }
             }
 
             if (!File.Exists(outputPath))
@@ -115,19 +129,27 @@ public class SpeechToTextService : ISpeechToTextService
             }
 
             // Open the PCM file and send it for transcription
-            await using var audioStream = new FileStream(outputPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            var result = await ProcessRawAudioStream(audioStream);
+            SpeechToTextResponse result;
 
-            // Clean up: Delete the temp files after processing
-            File.Delete(inputPath);
-            File.Delete(outputPath);
+            try
+            {
+                await using (var audioStream = new FileStream(outputPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    result = await ProcessRawAudioStream(audioStream);
+                }
+            }
+            finally
+            {
+                if (File.Exists(inputPath)) File.Delete(inputPath);
+                if (File.Exists(outputPath)) File.Delete(outputPath);
+            }
 
             return result;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception($"File transcription error: {ex.Message}");
-        }
+        // }
+        // catch (Exception ex)
+        // {
+        //     throw new Exception($"File transcription error: {ex.Message}");
+        // }
     }
 
     private bool IsFileLocked(string filePath)

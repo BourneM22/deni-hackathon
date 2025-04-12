@@ -36,7 +36,7 @@ namespace api.Services
         {
             List<NoteTagResponse> tags = await _noteTagService.GetAllNoteTags(userId);
 
-            if (!tags.Any(t => t.TagId == newNoteRequest.TagId))
+            if (newNoteRequest.TagId != null && !tags.Any(t => t.TagId == newNoteRequest.TagId))
             {
                 throw new TagIdNotFoundException();
             }
@@ -62,7 +62,7 @@ namespace api.Services
         {
             List<NoteTagResponse> tags = await _noteTagService.GetAllNoteTags(userId);
 
-            if (!tags.Any(t => t.TagId == updatedNote.TagId))
+            if (updatedNote.TagId != null && !tags.Any(t => t.TagId == updatedNote.TagId))
             {
                 throw new TagIdNotFoundException();
             }

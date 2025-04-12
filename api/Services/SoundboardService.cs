@@ -34,7 +34,7 @@ namespace api.Services
         {
             List<SoundboardFilterResponse> filters = await _soundboardFilterService.GetAllSounboardFilters(userId);
 
-            if (!filters.Any(f => f.FilterId == soundboardRequest.FilterId))
+            if (soundboardRequest.FilterId != null && !filters.Any(f => f.FilterId == soundboardRequest.FilterId))
             {
                 throw new FilterIdNotFoundException();
             }
@@ -182,7 +182,7 @@ namespace api.Services
         {
             List<SoundboardFilterResponse> filters = await _soundboardFilterService.GetAllSounboardFilters(userId);
 
-            if (!filters.Any(f => f.FilterId == updateSoundboardRequest.FilterId))
+            if (updateSoundboardRequest.FilterId != null && !filters.Any(f => f.FilterId == updateSoundboardRequest.FilterId))
             {
                 throw new FilterIdNotFoundException();
             }

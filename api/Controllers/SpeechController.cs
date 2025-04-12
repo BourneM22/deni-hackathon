@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using api.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -29,25 +30,35 @@ namespace api.Controllers
                 return BadRequest("No file provided.");
             }
 
-            // Check if the uploaded file is PCM (raw audio)
-            var validMimeTypes = new[] { "audio/raw", "application/octet-stream" };
-
-            if (!validMimeTypes.Contains(file.ContentType, StringComparer.OrdinalIgnoreCase))
-            {
-                return BadRequest("Invalid file format. Please upload a PCM file.");
-            }
-
-            // Validate file size or other constraints if needed
-            if (file.Length > 10 * 1024 * 1024)  // Max size 10MB for example
+            // Optional size check (10MB)
+            if (file.Length > 10 * 1024 * 1024)
             {
                 return BadRequest("File size is too large. Maximum allowed size is 10MB.");
             }
 
+            // Extract file extension
+            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+
             try
             {
-                // Process PCM file
-                var result = await _speechToTextService.ProcessRawAudioStream(file.OpenReadStream());
-                return Ok(result);  // Return the transcription result
+                SpeechToTextResponse result;
+
+                if (extension == ".pcm")
+                {
+                    // Direct raw PCM stream
+                    result = await _speechToTextService.ProcessRawAudioStream(file.OpenReadStream());
+                }
+                else if (extension == ".wav" || extension == ".mp3" || extension == ".m4a")
+                {
+                    // Use FFmpeg pipeline
+                    result = await _speechToTextService.ProcessAudioFile(file);
+                }
+                else
+                {
+                    return BadRequest("Unsupported file format. Only .pcm, .wav, .mp3, or .m4a are allowed.");
+                }
+
+                return Ok(result);
             }
             catch (Exception ex)
             {

@@ -12,6 +12,8 @@ class LoginController extends GetxController {
   final emailTFController = TextEditingController();
   final passwordTFController = TextEditingController();
 
+  bool isLoading = false;
+
   @override
   void onInit() {
     super.onInit();
@@ -23,6 +25,8 @@ class LoginController extends GetxController {
   }
 
   Future<void> login() async {
+    isLoading = true;
+    update();
     try {
       final data = {
         'email': emailTFController.text,
@@ -36,9 +40,11 @@ class LoginController extends GetxController {
       await prefs.setString('token', response.accessToken!);
       await prefs.setString('tokenType', response.tokenType!);
       await prefs.setInt('expiresInMinutes', response.expiresInMinutes!);
-      
+
+      isLoading = false;
       Get.offAllNamed(MainRoute.main);
     } catch (e) {
+      isLoading = false;
       Fluttertoast.showToast(
         msg: "Email and password doesn't match!",
         toastLength: Toast.LENGTH_LONG,
@@ -48,6 +54,7 @@ class LoginController extends GetxController {
         fontSize: 12.0,
       );
     }
+    update();
   }
 
   void closeAndShowModal(BuildContext context) {

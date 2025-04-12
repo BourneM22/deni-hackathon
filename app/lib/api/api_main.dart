@@ -11,8 +11,7 @@ class ApiMain {
   Future<SoundboardGetResponse> getSoundboard() async {
     try {
       final jsonResponse = await apiService.requestGet('$baseUrl/soundboards');
-
-      return SoundboardGetResponse.fromJson(jsonResponse);
+      return SoundboardGetResponse.fromJson({'data': jsonResponse});
     } catch (e) {
       throw Exception('Failed to fetch soundboard: $e');
     }

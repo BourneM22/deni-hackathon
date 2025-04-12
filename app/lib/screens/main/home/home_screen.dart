@@ -1,3 +1,4 @@
+import 'package:deni_hackathon/constants/colors_constants.dart';
 import 'package:deni_hackathon/screens/main/home/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,9 +14,10 @@ class HomeScreen extends StatelessWidget {
       init: HomeController(),
       builder: (HomeController controller) {
         return Scaffold(
+          backgroundColor: ColorsConstants.baseColor,
           appBar: AppBar(
             automaticallyImplyLeading: false,
-            backgroundColor: Colors.white,
+            backgroundColor: ColorsConstants.baseColor,
             elevation: 0,
             centerTitle: true,
             title: Text(
@@ -39,11 +41,12 @@ class HomeScreen extends StatelessWidget {
 
             },
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.4,
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
                     child: Text(
                       "Hello I'm Bourne!\nWhat's your name?",
                       style: deniStyle(fontSize: 16),
@@ -54,7 +57,7 @@ class HomeScreen extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.only(top: 8),
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
+                      color: ColorsConstants.whiteColor,
                       borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(20),
                         topRight: Radius.circular(20),
@@ -73,7 +76,7 @@ class HomeScreen extends StatelessWidget {
                                   horizontal: 12,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: ColorsConstants.darkerWhiteColor,
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: const Text('All'),
@@ -83,40 +86,44 @@ class HomeScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Expanded(
-                          child: GridView.builder(
+                          child: controller.isLoading
+                              ? const Center(
+                                  child: CircularProgressIndicator(),
+                                )
+                              :
+                           GridView.builder(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: 2,
                                   crossAxisSpacing: 8,
                                   mainAxisSpacing: 8,
-                                  childAspectRatio: 3,
+                                  childAspectRatio: 2,
                                 ),
-                            itemCount: 6,
+                            itemCount: controller.soundboardList.length,
                             itemBuilder: (context, index) {
+                              final soundboard = controller.soundboardList[index];
                               return Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: ColorsConstants.darkerWhiteColor,
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      index % 2 == 0
-                                          ? 'Introduction'
-                                          : 'Explain Condition',
+                                      soundboard.name!,
                                       style: deniStyle(
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      index % 2 == 0
-                                          ? 'Hello my name is Hans!'
-                                          : "I'm deaf, so I'm using this cool new app to commun...",
+                                      soundboard.description!,
                                       style: deniStyle(fontSize: 12),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ],
                                 ),

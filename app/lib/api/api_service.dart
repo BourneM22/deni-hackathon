@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 final apiService = ApiService();
 
 class ApiService {
-  Future<Map<String, dynamic>> requestGet(String url) async {
+  Future<dynamic> requestGet(String url) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token') ?? '';
@@ -17,20 +17,24 @@ class ApiService {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
-        }
+        },
       );
+      final decodedResponse = json.decode(response.body);
 
-      if (response.statusCode == 200) {
-        return response.body as Map<String, dynamic>;
+      // Check if the response is a Map or a List
+      if (decodedResponse is Map<String, dynamic>) {
+        return decodedResponse;
+      } else if (decodedResponse is List<dynamic>) {
+        return decodedResponse;
       } else {
-        throw Exception('Failed to load data');
+        throw Exception('Unexpected response format');
       }
     } catch (e) {
       throw Exception('Failed to fetch data: $e');
     }
   }
 
-  Future<Map<String, dynamic>> requestPost(String url, Map<String, dynamic> body) async {
+  Future<dynamic> requestPost(String url, Map<String, dynamic> body) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token') ?? '';
@@ -45,17 +49,22 @@ class ApiService {
         body: json.encode(body),
       );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return json.decode(response.body) as Map<String, dynamic>;
+      final decodedResponse = json.decode(response.body);
+
+      // Check if the response is a Map or a List
+      if (decodedResponse is Map<String, dynamic>) {
+        return decodedResponse;
+      } else if (decodedResponse is List<dynamic>) {
+        return decodedResponse;
       } else {
-        throw Exception('Failed to post data');
+        throw Exception('Unexpected response format');
       }
     } catch (e) {
       throw Exception('Failed to post data: $e');
     }
   }
 
-  Future<Map<String, dynamic>> requestPut(String url, Map<String, dynamic> body) async {
+  Future<dynamic> requestPut(String url, Map<String, dynamic> body) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token') ?? '';
@@ -70,17 +79,22 @@ class ApiService {
         body: json.encode(body),
       );
 
-      if (response.statusCode == 200) {
-        return json.decode(response.body) as Map<String, dynamic>;
+      final decodedResponse = json.decode(response.body);
+
+      // Check if the response is a Map or a List
+      if (decodedResponse is Map<String, dynamic>) {
+        return decodedResponse;
+      } else if (decodedResponse is List<dynamic>) {
+        return decodedResponse;
       } else {
-        throw Exception('Failed to update data');
+        throw Exception('Unexpected response format');
       }
     } catch (e) {
       throw Exception('Failed to update data: $e');
     }
   }
 
-  Future<void> requestDelete(String url) async {
+  Future<dynamic> requestDelete(String url) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token') ?? '';
@@ -94,8 +108,15 @@ class ApiService {
         },
       );
 
-      if (response.statusCode != 200) {
-        throw Exception('Failed to delete data');
+      final decodedResponse = json.decode(response.body);
+
+      // Check if the response is a Map or a List
+      if (decodedResponse is Map<String, dynamic>) {
+        return decodedResponse;
+      } else if (decodedResponse is List<dynamic>) {
+        return decodedResponse;
+      } else {
+        throw Exception('Unexpected response format');
       }
     } catch (e) {
       throw Exception('Failed to delete data: $e');

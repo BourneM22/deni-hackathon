@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 
 import '../../../api-response/soundboard_get_response.dart';
 import '../../../api/api_main.dart';
+import '../../../utils/logger.dart';
 
 
 class HomeController extends GetxController {
@@ -27,11 +28,11 @@ class HomeController extends GetxController {
   Future<void> getSoundboard() async {
     try {
       final response = await apiMain.getSoundboard();
-
       soundboardList = response.soundboards!;
       isLoading = false;
       update();
     } catch (e) {
+      log.e(e);
       isError = true;
       update();
     } finally {

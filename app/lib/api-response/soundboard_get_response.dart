@@ -4,9 +4,9 @@ class SoundboardGetResponse {
   SoundboardGetResponse({this.soundboards});
 
   SoundboardGetResponse.fromJson(Map<String, dynamic> json) {
-    if (json['soundboards'] != null) {
+    if (json['data'] != null) {
       soundboards = <Soundboard>[];
-      json['soundboards'].forEach((v) {
+      json['data'].forEach((v) {
         soundboards!.add(Soundboard.fromJson(v));
       });
     }
@@ -15,7 +15,7 @@ class SoundboardGetResponse {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     if (soundboards != null) {
-      data['soundboards'] = soundboards!.map((v) => v.toJson()).toList();
+      data['data'] = soundboards!.map((v) => v.toJson()).toList();
     }
     return data;
   }

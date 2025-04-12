@@ -133,14 +133,19 @@ class LoginDialog extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        child: Text(
-                          'Sign In',
-                          style: deniStyle(
-                            fontSize: 16,
-                            color: ColorsConstants.primaryColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child:
+                            controller.isLoading == true
+                                ? const CircularProgressIndicator(
+                                  color: ColorsConstants.trueWhiteColor,
+                                )
+                                : const Text(
+                                  'Login',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: ColorsConstants.trueWhiteColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                         onPressed: () {
                           controller.login();
                         },

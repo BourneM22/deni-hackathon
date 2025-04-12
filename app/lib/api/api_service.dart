@@ -49,16 +49,7 @@ class ApiService {
         body: json.encode(body),
       );
 
-      final decodedResponse = json.decode(response.body);
-
-      // Check if the response is a Map or a List
-      if (decodedResponse is Map<String, dynamic>) {
-        return decodedResponse;
-      } else if (decodedResponse is List<dynamic>) {
-        return decodedResponse;
-      } else {
-        throw Exception('Unexpected response format');
-      }
+      return response;
     } catch (e) {
       throw Exception('Failed to post data: $e');
     }
@@ -79,16 +70,7 @@ class ApiService {
         body: json.encode(body),
       );
 
-      final decodedResponse = json.decode(response.body);
-
-      // Check if the response is a Map or a List
-      if (decodedResponse is Map<String, dynamic>) {
-        return decodedResponse;
-      } else if (decodedResponse is List<dynamic>) {
-        return decodedResponse;
-      } else {
-        throw Exception('Unexpected response format');
-      }
+      return response;
     } catch (e) {
       throw Exception('Failed to update data: $e');
     }
@@ -107,17 +89,8 @@ class ApiService {
           'Authorization': 'Bearer $token',
         },
       );
-
-      final decodedResponse = json.decode(response.body);
-
-      // Check if the response is a Map or a List
-      if (decodedResponse is Map<String, dynamic>) {
-        return decodedResponse;
-      } else if (decodedResponse is List<dynamic>) {
-        return decodedResponse;
-      } else {
-        throw Exception('Unexpected response format');
-      }
+      
+      return response;
     } catch (e) {
       throw Exception('Failed to delete data: $e');
     }

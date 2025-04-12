@@ -26,4 +26,24 @@ class ApiMain {
       throw Exception('Failed to create soundboard: $e');
     }
   }
+
+  Future<bool> updateSoundboard(String soundboardId, Map<String, dynamic> data) async {
+    try {
+      await apiService.requestPut('$baseUrl/soundboards/$soundboardId', data);
+
+      return true;
+    } catch (e) {
+      throw Exception('Failed to update soundboard: $e');
+    }
+  }
+
+  Future<bool> deleteSoundboard(String soundboardId) async {
+    try {
+      await apiService.requestDelete('$baseUrl/soundboards/$soundboardId');
+
+      return true;
+    } catch (e) {
+      throw Exception('Failed to delete soundboard: $e');
+    }
+  }
 }

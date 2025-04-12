@@ -36,7 +36,7 @@ class Soundboard {
 
   Soundboard.fromJson(Map<String, dynamic> json) {
     soundId = json['soundId'] ?? '';
-    filterId = json['filterId'] ?? '';
+    filterId = json['filterId'];
     name = json['name'] ?? '';
     description = json['description'] ?? '';
   }

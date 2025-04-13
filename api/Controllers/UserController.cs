@@ -46,7 +46,7 @@ namespace api.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateUserInfo([FromBody] RegisterRequest registerRequest)
+        public async Task<IActionResult> UpdateUserInfo([FromBody] UpdateUserRequest updateUserRequest)
         {
             if (!ModelState.IsValid)
             {
@@ -56,7 +56,7 @@ namespace api.Controllers
             String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
             String userId = _jwtService.GetUserIdFromToken(token);
 
-            await _userService.UpdateUserInfo(registerRequest, userId);
+            await _userService.UpdateUserInfo(updateUserRequest, userId);
 
             return Ok();
         }

@@ -9,7 +9,7 @@ namespace api.Services
     public interface IUserService
     {
         Task<UserInfoResponse> GetUserInfo(string userId);
-        Task UpdateUserInfo(RegisterRequest registerRequest, String userId);
+        Task UpdateUserInfo(UpdateUserRequest updateUserRequest, String userId);
         Task UpdateProfilePicturePath(String newProfilePicturePath, String userId);
         Task<ProfilePictureBytes> GetProfilePictureByte(String userId);
         Task<Boolean> CheckIsAdmin(String userId);
@@ -64,20 +64,30 @@ namespace api.Services
             return user;
         }
 
-        public async Task UpdateUserInfo(RegisterRequest registerRequest, String userId)
+        public async Task UpdateUserInfo(UpdateUserRequest updateUserRequest, String userId)
         {
-            String query = "update USER " +
-                "set name = ?, gender = ?, birth_date = ?, email = ?, password = ? " + 
-                "where user_id = ?;";
+            String query;
+
+            if (updateUserRequest.Password != null)
+            {
+                query = "update USER " +
+                    "set name = ?, gender = ?, birth_date = ?, email = ?, password = ? " + 
+                    "where user_id = ?;";
+            } else
+            {
+                query = "update USER " +
+                    "set name = ?, gender = ?, birth_date = ?, email = ? " + 
+                    "where user_id = ?;";
+            }
 
             using var conn = _dbConnection.GetConnection();
             using var cmd = new MySqlCommand(query, conn);
 
-            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = registerRequest.Name });
-            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = registerRequest.Gender });
-            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Timestamp, Value = registerRequest.BirthDate });
-            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = registerRequest.Email });
-            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = _passwordHasher.Hash(registerRequest.Password) });
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = updateUserRequest.Name });
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = updateUserRequest.Gender });
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Timestamp, Value = updateUserRequest.BirthDate });
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = updateUserRequest.Email });
+            if (updateUserRequest.Password != null) cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = _passwordHasher.Hash(updateUserRequest.Password) });
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = userId });
 
             int res = await cmd.ExecuteNonQueryAsync();

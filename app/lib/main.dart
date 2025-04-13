@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Deni Hackathon',
-      initialRoute: AuthRoute.welcome,
+      initialRoute: MainRoute.notes,
       getPages: AppPages.pages,  
     );
   }

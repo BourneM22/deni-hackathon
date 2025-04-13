@@ -1,9 +1,16 @@
+import 'package:audioplayers/audioplayers.dart';
+import 'package:deni_hackathon/constants/assets_constants.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:vibration/vibration.dart';
 
+import '../../../utils/logger.dart';
+
 class EmergencyController extends GetxController {
   bool _isVibrating = false;
+
+
+  final AudioPlayer audioPlayer = AudioPlayer();
 
   @override
   void onInit() {
@@ -18,6 +25,8 @@ class EmergencyController extends GetxController {
 
     // Start vibration
     _startVibration();
+
+    playEmergencyAudio(); // Play emergency audio
   }
 
   @override
@@ -32,6 +41,8 @@ class EmergencyController extends GetxController {
     ]);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
+    audioPlayer.dispose(); // Dispose of the audio player
+    audioPlayer.stop(); // Stop any ongoing audio playback
     super.dispose();
   }
 
@@ -51,5 +62,16 @@ class EmergencyController extends GetxController {
   void _stopVibration() {
     _isVibrating = false;
     Vibration.cancel(); // Stop any ongoing vibration
+  }
+
+  void playEmergencyAudio() async {
+    try {
+      // Load the audio file from assets
+      await audioPlayer.setSource(AssetSource('audio/emergency.mp3'));
+      // Play the audio
+      await audioPlayer.resume();
+    } catch (e) {
+      log.e("Error playing audio: $e");
+    }
   }
 }

@@ -20,5 +20,5 @@ class AssetConstants {
   static const String ttsIcon = 'assets/icons/tts.svg';
 
   // Audio
-  static const String ttsAudio = 'assets/audio/emergency.mp3';
+  static const String emergencyAudio = 'assets/audio/emergency.mp3';
 }

@@ -3,9 +3,12 @@ import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:deni_hackathon/routes/route_name.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_sound/flutter_sound.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../../api-response/soundboard_get_response.dart';
 import '../../../api/api_main.dart';
@@ -22,6 +25,10 @@ class HomeController extends GetxController {
 
   final ScrollController scrollController = ScrollController();
 
+  bool isRecording = false;
+  final FlutterSoundRecorder recorder = FlutterSoundRecorder();
+  String? recordedFilePath;
+
   bool isExpanded = false;
   bool isEditMode = false;
   Soundboard? selectedSoundboard;
@@ -34,12 +41,78 @@ class HomeController extends GetxController {
     super.onInit();
     getSoundboard();
     initChatList();
+    initializeRecorder();
   }
 
   @override
   void dispose() {
+    recorder.closeRecorder();
+    audioPlayer.dispose();
     super.dispose();
   }
+
+  Future<void> initializeRecorder() async {
+    await recorder.openRecorder();
+    await requestPermissions();
+  }
+
+  Future<void> requestPermissions() async {
+  // Request microphone permission
+  final microphoneStatus = await Permission.microphone.request();
+  if (microphoneStatus.isDenied) {
+    // Show a dialog or prompt to ask for permission
+    await _showPermissionDialog(
+      "Microphone Permission",
+      "This app requires microphone access to record audio. Please grant the permission.",
+    );
+    await Permission.microphone.request(); // Re-request permission
+  }
+
+  // Request storage permission
+  final storageStatus = await Permission.storage.request();
+  await Permission.audio.request(); // Re-request permission for audio
+  await Permission.manageExternalStorage.request(); // Re-request permission for audio
+  // if (storageStatus.isDenied) {
+  //   // Show a dialog or prompt to ask for permission
+  //   await _showPermissionDialog(
+  //     "Storage Permission",
+  //     "This app requires storage access to save audio files. Please grant the permission.",
+  //   );
+  //   log.d('a');
+  //   await Permission.storage.request();
+  //   log.d('z');
+  // }
+
+  // Handle permanently denied permissions
+  if (microphoneStatus.isPermanentlyDenied || storageStatus.isPermanentlyDenied) {
+    await _showPermissionDialog(
+      "Permissions Required",
+      "Microphone and storage permissions are permanently denied. Please enable them in the app settings.",
+      openSettings: true,
+    );
+  }
+}
+
+// Helper method to show a permission dialog
+Future<void> _showPermissionDialog(String title, String message, {bool openSettings = false}) async {
+  await Get.dialog(
+    AlertDialog(
+      title: Text(title),
+      content: Text(message),
+      actions: [
+        TextButton(
+          onPressed: () {
+            if (openSettings) {
+              openAppSettings(); // Open app settings if required
+            }
+            Get.back(); // Close the dialog
+          },
+          child: Text("OK"),
+        ),
+      ],
+    ),
+  );
+}
 
   Future<void> getSoundboard() async {
     try {
@@ -59,6 +132,63 @@ class HomeController extends GetxController {
 
   void onClickProfile() {
     Get.toNamed(ProfileRoute.profile);
+  }
+
+  Future<void> onStartRecording() async {
+    try {
+      isRecording = true;
+      update();
+
+      final directory = await getTemporaryDirectory();
+      recordedFilePath = '${directory.path}/recording.wav';
+
+      await recorder.startRecorder(
+        toFile: recordedFilePath,
+        codec: Codec.pcm16WAV,
+      );
+    } catch (e) {
+      log.e("Error starting recording: $e");
+    }
+  }
+
+  Future<void> onStopRecording() async {
+    try {
+      await recorder.stopRecorder();
+      isRecording = false;
+      update();
+
+      if (recordedFilePath != null) {
+        final file = File(recordedFilePath!);
+
+      if (await file.exists()) {
+        await sendRecordingToBackend(recordedFilePath!);
+      } else {
+        log.e("File not found at: $recordedFilePath");
+      }
+      }
+    } catch (e) {
+      log.e("Error stopping recording: $e");
+    }
+  }
+
+  Future<void> sendRecordingToBackend(String filePath) async {
+    try {
+      final file = File(filePath);
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse('http://192.168.18.10:5055/api/speech/transcribe'),
+      );
+      request.files.add(await http.MultipartFile.fromPath('file', file.path));
+      final response = await request.send();
+
+      if (response.statusCode == 200) {
+        log.i("File uploaded successfully.");
+      } else {
+        log.e("Failed to upload file. Status code: ${response.statusCode}");
+      }
+    } catch (e) {
+      log.e("Error uploading file: $e");
+    }
   }
 
   void onClearChat() {

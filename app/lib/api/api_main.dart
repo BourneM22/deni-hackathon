@@ -6,7 +6,7 @@ import 'api_service.dart';
 final apiMain = ApiMain();
 
 class ApiMain {
-  final baseUrl = 'http://10.0.2.2:5055/api';
+  final baseUrl = 'http://192.168.18.10:5055/api';
 
   Future<SoundboardGetResponse> getSoundboard() async {
     try {

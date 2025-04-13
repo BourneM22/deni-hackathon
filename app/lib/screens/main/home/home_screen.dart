@@ -22,18 +22,44 @@ class HomeScreen extends StatelessWidget {
             backgroundColor: ColorsConstants.baseColor,
             elevation: 0,
             centerTitle: true,
-            title: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-              decoration: BoxDecoration(
-                color: ColorsConstants.lightRedColor,
-                borderRadius: BorderRadius.circular(20),
+            title: controller.isRecording == true ?
+            InkWell(
+              onTap: () {
+                controller.onStopRecording();
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                decoration: BoxDecoration(
+                  color: ColorsConstants.lightRedColor,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  'Listening',
+                  style: deniStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
               ),
-              child: Text(
-                'Listening',
-                style: deniStyle(
-                  color: Colors.red,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
+            ) : 
+            InkWell(
+              onTap: () {
+                controller.onStartRecording();
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                decoration: BoxDecoration(
+                  color: ColorsConstants.lightGreyColor,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  'Paused',
+                  style: deniStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: ColorsConstants.trueBlackColor,
+                  ),
                 ),
               ),
             ),

@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 
 import '../../../constants/colors_constants.dart';
 import '../../../widgets/deni_style.dart';
-import '../../utils/logger.dart';
 
 class DeniScreen extends StatelessWidget {
   const DeniScreen({super.key});

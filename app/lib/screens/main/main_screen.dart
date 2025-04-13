@@ -134,7 +134,9 @@ class MainScreen extends StatelessWidget {
                           1,
                         ),
                         GestureDetector(
-                          onTap: () => (),
+                          onTap: () {
+                            controller.onClickEmergencyButton();
+                          },
                           child: Image.asset(AssetConstants.emergencyButton),
                         ),
                         _buildNavItem(

@@ -1,5 +1,6 @@
 import 'package:deni_hackathon/api-response/soundboard_get_response.dart';
 import 'package:deni_hackathon/constants/colors_constants.dart';
+import 'package:deni_hackathon/routes/route_name.dart';
 import 'package:deni_hackathon/screens/main/home/home_controller.dart';
 import 'package:deni_hackathon/widgets/deni_style.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,10 @@ class MainController extends GetxController {
   void changeBottomNavIndex(int index) {
     currentBottomNavIndex = index;
     update();
+  }
+
+  void onClickEmergencyButton() {
+    Get.toNamed(MainRoute.emergency);
   }
 
   void enterEditMode(dynamic soundboard) {

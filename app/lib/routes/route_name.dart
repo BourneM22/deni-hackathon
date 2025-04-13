@@ -4,4 +4,5 @@ abstract class AuthRoute {
 
 abstract class MainRoute {
   static const main = '/main';
+  static const emergency = '/emergency';
 }

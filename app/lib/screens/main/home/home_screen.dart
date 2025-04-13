@@ -1,6 +1,8 @@
+import 'package:deni_hackathon/constants/assets_constants.dart';
 import 'package:deni_hackathon/constants/colors_constants.dart';
 import 'package:deni_hackathon/screens/main/home/home_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
 import '../../../widgets/deni_style.dart';
@@ -20,19 +22,45 @@ class HomeScreen extends StatelessWidget {
             backgroundColor: ColorsConstants.baseColor,
             elevation: 0,
             centerTitle: true,
-            title: Text(
-              'Listening',
-              style: deniStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            title: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              decoration: BoxDecoration(
+                color: ColorsConstants.lightRedColor,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                'Listening',
+                style: deniStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 20),
+              ),
             ),
-            actions: const [
-              Padding(
-                padding: EdgeInsets.only(right: 16),
-                child: Icon(Icons.delete_outline, color: Colors.black),
+            actions: [
+              InkWell(
+                onTap: () {
+                  controller.onClearChat();
+                },
+                child: Padding(
+                  padding: EdgeInsets.only(right: 16),
+                  child: SvgPicture.asset(
+                    AssetConstants.deleteIcon,
+                    color: ColorsConstants.mediumGreyColor,
+                    height: 28,
+                    width: 28,
+                  ),
+                ),
               ),
             ],
-            leading: const Padding(
-              padding: EdgeInsets.only(left: 16),
-              child: Icon(Icons.person_outline, color: Colors.black),
+            leading: InkWell(
+              onTap: () {
+                controller.onClickProfile();
+              },
+              child: Padding(
+                padding: EdgeInsets.only(left: 16),
+                child: Icon(
+                  Icons.person_outline,
+                  color: ColorsConstants.mediumGreyColor,
+                  size: 28,
+                ),
+              ),
             ),
           ),
           floatingActionButton: Container(

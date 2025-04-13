@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:deni_hackathon/routes/route_name.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -53,6 +54,15 @@ class HomeController extends GetxController {
       isLoading = false;
       update();
     }
+  }
+
+  void onClickProfile() {
+    Get.toNamed(ProfileRoute.profile);
+  }
+
+  void onClearChat() {
+    chatList.clear();
+    update();
   }
 
   Future<void> createSoundboard() async {

@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/tts")]
     public class TextToSpeechController : ControllerBase

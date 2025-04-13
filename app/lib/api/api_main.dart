@@ -17,6 +17,15 @@ class ApiMain {
     }
   }
 
+  Future<dynamic> getSoundboardAudio(String soundboardId) async {
+    try {
+      final jsonResponse = await apiService.requestFileGet('$baseUrl/soundboards/$soundboardId/audio');
+      return jsonResponse;
+    } catch (e) {
+      throw Exception('Failed to fetch soundboard audio: $e');
+    }
+  }
+
   Future<bool> createSoundboard(Map<String, dynamic> data) async {
     try {
       await apiService.requestPost('$baseUrl/soundboards', data);

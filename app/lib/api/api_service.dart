@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../utils/logger.dart';
+
 final apiService = ApiService();
 
 class ApiService {
@@ -29,6 +31,27 @@ class ApiService {
       } else {
         throw Exception('Unexpected response format');
       }
+    } catch (e) {
+      throw Exception('Failed to fetch data: $e');
+    }
+  }
+
+  Future<dynamic> requestFileGet(String url) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
+
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+      log.d(response.body);
+
+      return response.bodyBytes;
     } catch (e) {
       throw Exception('Failed to fetch data: $e');
     }

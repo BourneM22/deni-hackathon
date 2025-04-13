@@ -1,6 +1,10 @@
+import 'dart:io';
+
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../../api-response/soundboard_get_response.dart';
 import '../../../api/api_main.dart';
@@ -19,6 +23,7 @@ class HomeController extends GetxController {
 
   bool isEditMode = false;
   Soundboard? selectedSoundboard;
+  final AudioPlayer audioPlayer = AudioPlayer();
 
   @override
   void onInit() {
@@ -239,20 +244,49 @@ class HomeController extends GetxController {
     update();
   }
 
-  void onClickSoundboard(Soundboard soundboard) {
-    chatList.add(Chat(message: soundboard.description, isUser: true));
-    update();
+  Future<void> onClickSoundboard(Soundboard soundboard) async {
+    try {
+      // Define the file path
+      final directory = await getTemporaryDirectory();
+      final filePath = '${directory.path}/${soundboard.soundId}.mp3';
+      final file = File(filePath);
 
-    // Animate scroll
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (scrollController.hasClients) {
-        scrollController.animateTo(
-          scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
+      // Check if the file already exists
+      if (await file.exists()) {
+        await audioPlayer.play(DeviceFileSource(filePath));
+      } else {
+        // Di download ke local, if not exists
+        final response = await apiMain.getSoundboardAudio(soundboard.soundId!);
+
+        await file.writeAsBytes(response);
+
+        await audioPlayer.play(DeviceFileSource(filePath));
       }
-    });
+
+      chatList.add(Chat(message: soundboard.description, isUser: true));
+      update();
+
+      // Animate scroll
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (scrollController.hasClients) {
+          scrollController.animateTo(
+            scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
+      });
+    } catch (e) {
+      log.e(e);
+      Fluttertoast.showToast(
+        msg: "Failed to load soundboard!",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: ColorsConstants.blackToastColor,
+        textColor: ColorsConstants.trueWhiteColor,
+        fontSize: 12.0,
+      );
+    }
   }
 
   void onLongPressSoundboard(Soundboard soundboard) {

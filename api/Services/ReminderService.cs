@@ -15,6 +15,7 @@ namespace api.Services
         Task AddNewReminder(String userId, ParsedReminderRequest reminderRequest);
         Task UpdateReminder(ParsedUpdateReminderRequest updateReminderRequest, String userId);
         Task DeleteReminder(String userId, String reminderId);
+        Task UpdateToDoneStatus(String userId, String reminderId);
     }
 
     public class ReminderService : IReminderService
@@ -277,6 +278,34 @@ namespace api.Services
             using MySqlConnection conn = _dbConnection.GetConnection();
             using MySqlCommand cmd = new MySqlCommand(query, conn);
 
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = reminderId });
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = userId });
+
+            int res = await cmd.ExecuteNonQueryAsync();
+
+            if (res == 0)
+            {
+                throw new Exception();
+            }
+        }
+
+        public async Task UpdateToDoneStatus(String userId, String reminderId)
+        {
+            ReminderResponse reminder = await GetReminderById(reminderId, userId);
+
+            if (reminder.Type == ReminderType.REMINDER)
+            {
+                return;
+            }
+
+            String query = "update REMINDER " +
+                "set is_done = ? " +
+                "where reminder_id = ? and user_id = ?;";
+
+            using MySqlConnection conn = _dbConnection.GetConnection();
+            using MySqlCommand cmd = new MySqlCommand(query, conn);
+
+            cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.Int32, Value = IsDone.DONE });
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = reminderId });
             cmd.Parameters.Add(new MySqlParameter() { MySqlDbType = MySqlDbType.VarChar, Value = userId });
 

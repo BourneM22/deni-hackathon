@@ -179,5 +179,17 @@ namespace api.Controllers
 
             return Ok();
         }
+
+        [HttpPut]
+        [Route("{reminderId}/done")]
+        public async Task<IActionResult> UpdateDoneStatus([FromRoute] String reminderId)
+        {
+            String token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last()!;
+            String userId = _jwtService.GetUserIdFromToken(token);
+
+            await _reminderService.UpdateToDoneStatus(userId, reminderId);
+
+            return Ok();
+        }
     }
 }

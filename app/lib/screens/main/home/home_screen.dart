@@ -41,18 +41,14 @@ class HomeScreen extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFF6C2727),
-                  Color(0xFF000000),
-                ],
+                colors: [Color(0xFF6C2727), Color(0xFF000000)],
               ),
             ),
             child: FloatingActionButton(
               onPressed: () {
                 controller.createSoundboard();
               },
-              backgroundColor:
-                  Colors.transparent,
+              backgroundColor: Colors.transparent,
               elevation: 0,
               child: const Icon(
                 Icons.add,
@@ -187,9 +183,18 @@ class HomeScreen extends StatelessWidget {
                                           controller.soundboardList[index];
                                       return InkWell(
                                         onTap: () {
-                                          controller.onClickSoundboard(
-                                            soundboard,
-                                          );
+                                          if (controller.isEditMode) {
+                                            if (soundboard == controller.selectedSoundboard) {
+                                              controller.onClearSelectedSoundboard();
+                                            } else {
+                                              controller.onLongPressSoundboard(soundboard);
+                                            }
+                                          } else {
+                                            controller.onClickSoundboard(
+                                              soundboard,
+                                            );
+                                          }
+                                          
                                         },
                                         onLongPress: () {
                                           controller.onLongPressSoundboard(
@@ -204,6 +209,15 @@ class HomeScreen extends StatelessWidget {
                                                     .darkerWhiteColor,
                                             borderRadius: BorderRadius.circular(
                                               10,
+                                            ),
+                                            border: Border.all(
+                                              color: soundboard ==
+                                                      controller.selectedSoundboard
+                                                  ? ColorsConstants
+                                                      .darkerPrimaryColor
+                                                  : ColorsConstants
+                                                      .darkerWhiteColor,
+                                              width: 2,
                                             ),
                                           ),
                                           child: Column(

@@ -257,6 +257,16 @@ class HomeController extends GetxController {
 
   void onLongPressSoundboard(Soundboard soundboard) {
     Get.find<MainController>().enterEditMode(soundboard);
+    isEditMode = true;
+    selectedSoundboard = soundboard;
+    update();
+  }
+
+  void onClearSelectedSoundboard() {
+    Get.find<MainController>().exitEditMode();
+    isEditMode = false;
+    selectedSoundboard = null;
+    update();
   }
 }
 

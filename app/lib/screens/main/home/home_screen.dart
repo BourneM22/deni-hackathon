@@ -30,7 +30,11 @@ class HomeScreen extends StatelessWidget {
               ),
               child: Text(
                 'Listening',
-                style: deniStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 20),
+                style: deniStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
               ),
             ),
             actions: [
@@ -63,26 +67,173 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
           ),
-          floatingActionButton: Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color(0xFF6C2727), Color(0xFF000000)],
+          floatingActionButton: Stack(
+            alignment: Alignment.bottomRight,
+            children: [
+              // Add Button (unchanged)
+              Positioned(
+                bottom: 0,
+                right: 64, // Adjust position to the left of the chevron button
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0xFF6C2727), Color(0xFF000000)],
+                    ),
+                  ),
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      controller.createSoundboard();
+                    },
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                    child: const Icon(
+                      Icons.add,
+                      color: ColorsConstants.trueWhiteColor,
+                    ),
+                  ),
+                ),
               ),
-            ),
-            child: FloatingActionButton(
-              onPressed: () {
-                controller.createSoundboard();
-              },
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              child: const Icon(
-                Icons.add,
-                color: ColorsConstants.trueWhiteColor,
+              // First additional button with animation
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                bottom: controller.isExpanded ? 75 : -75,
+                // right: 16,
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 300),
+                  opacity: controller.isExpanded ? 1.0 : 0.0,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () {
+                        controller.onClickAskDeni();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(32),
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [Color(0xFFA74B4B), Color(0xFF411D1D)],
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SvgPicture.asset(
+                              AssetConstants.askDeniIcon,
+                              color: ColorsConstants.trueWhiteColor,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Ask Deni',
+                              style: deniStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Afacad',
+                                color: ColorsConstants.trueWhiteColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ),
-            ),
+              // Second additional button with animation
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                bottom: controller.isExpanded ? 140 : -140,
+                // right: 16,
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 300),
+                  opacity: controller.isExpanded ? 1.0 : 0.0,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () {
+                        print("First button clicked");
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(32),
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [Color(0xFFA74B4B), Color(0xFF411D1D)],
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SvgPicture.asset(
+                              AssetConstants.ttsIcon,
+                              color: ColorsConstants.trueWhiteColor,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Text-to-Speech',
+                              style: deniStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Afacad',
+                                color: ColorsConstants.trueWhiteColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              // Chevron Button
+              Positioned(
+                bottom: 0,
+                // right: 16,
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0xFFAB4141), Color(0xFF5E0A0A)],
+                    ),
+                  ),
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      controller.toggleExpandButtons();
+                    },
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                    child: Transform.rotate(
+                      angle: controller.isExpanded ? -1.5708 : 1.5708,
+                      child: const Icon(
+                        Icons.chevron_left,
+                        color: ColorsConstants.trueWhiteColor,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
           floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
           body: RefreshIndicator(
@@ -212,17 +363,20 @@ class HomeScreen extends StatelessWidget {
                                       return InkWell(
                                         onTap: () {
                                           if (controller.isEditMode) {
-                                            if (soundboard == controller.selectedSoundboard) {
-                                              controller.onClearSelectedSoundboard();
+                                            if (soundboard ==
+                                                controller.selectedSoundboard) {
+                                              controller
+                                                  .onClearSelectedSoundboard();
                                             } else {
-                                              controller.onLongPressSoundboard(soundboard);
+                                              controller.onLongPressSoundboard(
+                                                soundboard,
+                                              );
                                             }
                                           } else {
                                             controller.onClickSoundboard(
                                               soundboard,
                                             );
                                           }
-                                          
                                         },
                                         onLongPress: () {
                                           controller.onLongPressSoundboard(
@@ -239,12 +393,14 @@ class HomeScreen extends StatelessWidget {
                                               10,
                                             ),
                                             border: Border.all(
-                                              color: soundboard ==
-                                                      controller.selectedSoundboard
-                                                  ? ColorsConstants
-                                                      .darkerPrimaryColor
-                                                  : ColorsConstants
-                                                      .darkerWhiteColor,
+                                              color:
+                                                  soundboard ==
+                                                          controller
+                                                              .selectedSoundboard
+                                                      ? ColorsConstants
+                                                          .darkerPrimaryColor
+                                                      : ColorsConstants
+                                                          .darkerWhiteColor,
                                               width: 2,
                                             ),
                                           ),

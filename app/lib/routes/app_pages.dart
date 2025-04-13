@@ -1,4 +1,5 @@
 import 'package:deni_hackathon/screens/auth/welcome/welcome_screen.dart';
+import 'package:deni_hackathon/screens/deni/deni_screen.dart';
 import 'package:deni_hackathon/screens/main/emergency/emergency_screen.dart';
 import 'package:deni_hackathon/screens/main/main_screen.dart';
 import 'package:deni_hackathon/screens/main/notes/notes_screen.dart';
@@ -32,6 +33,12 @@ class AppPages {
     GetPage(
       name: ProfileRoute.profile,
       page: () => const ProfileScreen(),
+    ),
+
+    /* Deni */
+    GetPage(
+      name: DeniRoute.deni,
+      page: () => const DeniScreen(),
     ),
   ];
 }

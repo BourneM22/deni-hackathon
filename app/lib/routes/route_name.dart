@@ -11,3 +11,7 @@ abstract class MainRoute {
 abstract class ProfileRoute {
   static const profile = '/profile';
 }
+
+abstract class DeniRoute {
+  static const deni = '/deni';
+}

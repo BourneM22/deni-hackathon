@@ -16,4 +16,9 @@ class AssetConstants {
   static const String profileIcon = 'assets/icons/profile.svg';
   static const String backIcon = 'assets/icons/back.svg';
   static const String saveIcon = 'assets/icons/save.svg';
+  static const String askDeniIcon = 'assets/icons/ask_deni.svg';
+  static const String ttsIcon = 'assets/icons/tts.svg';
+
+  // Audio
+  static const String ttsAudio = 'assets/audio/emergency.mp3';
 }

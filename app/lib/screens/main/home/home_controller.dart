@@ -22,6 +22,7 @@ class HomeController extends GetxController {
 
   final ScrollController scrollController = ScrollController();
 
+  bool isExpanded = false;
   bool isEditMode = false;
   Soundboard? selectedSoundboard;
   final AudioPlayer audioPlayer = AudioPlayer();
@@ -61,8 +62,17 @@ class HomeController extends GetxController {
   }
 
   void onClearChat() {
-    chatList.clear();
+    initChatList();
     update();
+  }
+
+  void toggleExpandButtons() {
+    isExpanded = !isExpanded;
+    update();
+  }
+
+  void onClickAskDeni() {
+    Get.toNamed(DeniRoute.deni);
   }
 
   Future<void> createSoundboard() async {
@@ -79,7 +89,7 @@ class HomeController extends GetxController {
         return Align(
           alignment: Alignment.bottomCenter,
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 32.0),
             child: Material(
               borderRadius: BorderRadius.circular(12),
               color: ColorsConstants.baseColor,

@@ -443,7 +443,7 @@ class ProfileScreen extends StatelessWidget {
           children: [
             // Cancel Button
             Container(
-              margin: const EdgeInsets.only(right: 16),
+              margin: const EdgeInsets.only(right: 12),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: LinearGradient(

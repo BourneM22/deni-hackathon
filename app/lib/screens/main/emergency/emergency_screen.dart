@@ -29,6 +29,7 @@ class EmergencyScreen extends StatelessWidget {
                   ),
                   InkWell(
                     onTap: () {
+                      controller.dispose();
                       Navigator.pop(context);
                     },
                     child: Container(

@@ -57,7 +57,7 @@ class ApiService {
     }
   }
 
-  Future<dynamic> requestPost(String url, Map<String, dynamic> body) async {
+  Future<dynamic> requestFilePost(String url, Map<String, dynamic> body) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token') ?? '';
@@ -72,7 +72,32 @@ class ApiService {
         body: json.encode(body),
       );
 
-      final decodedResponse = json.decode(response.body);
+      return response.bodyBytes;
+    } catch (e) {
+      throw Exception('Failed to post data: $e');
+    }
+  }
+
+  Future<dynamic> requestPost(String url, Map<String, dynamic> body) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode(body),
+      );
+      var decodedResponse;
+      try {
+        decodedResponse = json.decode(response.body);
+      } catch (e) {
+        return response;
+      }
 
       if (decodedResponse is Map<String, dynamic>) {
         return decodedResponse;

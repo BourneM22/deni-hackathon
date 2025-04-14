@@ -1,13 +1,21 @@
 import 'package:deni_hackathon/api-response/notes_get_response.dart';
 import 'package:deni_hackathon/api/api_main.dart';
 import 'package:deni_hackathon/screens/main/notes/add_note_screen.dart';
+import 'package:flutter/widgets.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+
+import '../../../constants/colors_constants.dart';
+import '../../../utils/logger.dart';
 
 class NotesController extends GetxController {
   /* ------------------------------- Properties ------------------------------- */
   String? query;                        // User's query
   String? tagFilter;                    // Tag filter ex: (All, Important, etc)
   List<Notes> noteList = List.empty();  // Variable to store & display user's notes
+
+  final TextEditingController titleTFController = TextEditingController();
+  final TextEditingController contentTFController = TextEditingController(); 
 
   /* --------------------------------- Methods -------------------------------- */
   @override
@@ -45,9 +53,44 @@ class NotesController extends GetxController {
     );
 
     noteList = temp.notes ?? [];
+    update();
   }
 
-  void navigateToAddNoteScreen() {
-    Get.to(() => const AddNoteScreen());
+  void navigateToAddNoteScreen() async {
+    final result = await Get.to(() => const AddNoteScreen());
+  if (result == true) {
+    // Reload the notes if a new note was added
+    getNote(tagFilter, query);
+  }
+  }
+
+  Future<void> onSaveNotes() async {
+    try {
+      final data = {
+        'title': titleTFController.text,
+        'content': contentTFController.text,
+      };
+      await apiMain.createNote(data);
+
+      Get.back(result: true); // Close the AddNoteScreen and return true
+      Fluttertoast.showToast(
+        msg: "Note created successfully!",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: ColorsConstants.blackToastColor,
+        textColor: ColorsConstants.trueWhiteColor,
+        fontSize: 12.0,
+      );
+    } catch (e) {
+      log.e(e);
+      Fluttertoast.showToast(
+        msg: "Something went wrong!",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: ColorsConstants.blackToastColor,
+        textColor: ColorsConstants.trueWhiteColor,
+        fontSize: 12.0,
+      );
+    }
   }
 }

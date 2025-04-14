@@ -224,7 +224,7 @@ Future<void> _showPermissionDialog(String title, String message, {bool openSetti
         return Align(
           alignment: Alignment.bottomCenter,
           child: Padding(
-            padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 32.0),
+            padding: EdgeInsets.only(left: 16.0, right: 16.0, bottom: MediaQuery.of(context).viewInsets.bottom + 32.0),
             child: Material(
               borderRadius: BorderRadius.circular(12),
               color: ColorsConstants.baseColor,
@@ -408,15 +408,19 @@ Future<void> _showPermissionDialog(String title, String message, {bool openSetti
 
       // Check if the file already exists
       if (await file.exists()) {
-        await audioPlayer.play(DeviceFileSource(filePath));
-      } else {
+        // await audioPlayer.play(DeviceFileSource(filePath));
+        await file.delete(); // Optionally delete the file after playing
+      }
+
         // Di download ke local, if not exists
         final response = await apiMain.getSoundboardAudio(soundboard.soundId!);
 
         await file.writeAsBytes(response);
 
         await audioPlayer.play(DeviceFileSource(filePath));
-      }
+
+        await file.delete(); // Optionally delete the file after playing
+      
 
       chatList.add(Chat(message: soundboard.description, isUser: true));
       update();
@@ -459,11 +463,187 @@ Future<void> _showPermissionDialog(String title, String message, {bool openSetti
   }
 
   void onClickTextToSpeech() {
-    // Open input field dialog
-    final TextEditingController textController = TextEditingController();
+  final TextEditingController textController = TextEditingController();
 
-    
+  showGeneralDialog(
+    context: Get.context!,
+    barrierDismissible: true,
+    barrierLabel: "Dismiss",
+    barrierColor: Colors.black.withOpacity(0.4), // Dim background
+    transitionDuration: const Duration(milliseconds: 300),
+    pageBuilder: (context, animation, secondaryAnimation) {
+      return Align(
+        alignment: Alignment.bottomCenter,
+        child: Padding(
+          padding: EdgeInsets.only(left: 16.0, right: 16.0, bottom: MediaQuery.of(context).viewInsets.bottom + 32.0),
+          child: Material(
+            borderRadius: BorderRadius.circular(12),
+            color: ColorsConstants.baseColor,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: TextFormField(
+                      controller: textController,
+                      maxLines: 3,
+                      style: deniStyle(
+                        fontSize: 16,
+                        fontFamily: 'Afacad',
+                        color: ColorsConstants.darkGreyColor,
+                      ),
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        fillColor: ColorsConstants.whiteColor,
+                        filled: true,
+                        hintText: 'Enter text to convert to speech...',
+                        hintStyle: deniStyle(
+                          fontSize: 16,
+                          fontFamily: 'Afacad',
+                          color: ColorsConstants.mediumGreyColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 16.0),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: ColorsConstants.lightRedColor,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(8),
+                                ),
+                              ),
+                            ),
+                            onPressed: () => Navigator.pop(context),
+                            child: Text(
+                              'Cancel',
+                              style: deniStyle(
+                                fontSize: 16,
+                                fontFamily: 'Afacad',
+                                color: ColorsConstants.redColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 16.0),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: ColorsConstants.lightGreenColor,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(8),
+                                ),
+                              ),
+                            ),
+                            onPressed: () async {
+                              final text = textController.text.trim();
+                              if (text.isNotEmpty) {
+                                Navigator.pop(context);
+                                await playTextToSpeech(text);
+                              } else {
+                                Fluttertoast.showToast(
+                                  msg: "Please enter some text!",
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.CENTER,
+                                  backgroundColor: ColorsConstants.blackToastColor,
+                                  textColor: ColorsConstants.trueWhiteColor,
+                                  fontSize: 12.0,
+                                );
+                              }
+                            },
+                            child: Text(
+                              'Convert',
+                              style: deniStyle(
+                                fontSize: 16,
+                                fontFamily: 'Afacad',
+                                color: ColorsConstants.greenColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    },
+    transitionBuilder: (context, animation, secondaryAnimation, child) {
+      return SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, 1),
+          end: Offset.zero,
+        ).animate(
+          CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+        ),
+        child: FadeTransition(
+          opacity: CurvedAnimation(parent: animation, curve: Curves.easeIn),
+          child: child,
+        ),
+      );
+    },
+  );
+}
+
+Future<void> playTextToSpeech(String text) async {
+  try {
+    // Send the text to the backend for TTS processing
+    final data = {
+      'text': text,
+    };
+    final response = await apiMain.textToSpeech(data);
+
+    // Save the audio file locally
+    final directory = await getTemporaryDirectory();
+    final filePath = '${directory.path}/tts_audio.mp3';
+    final file = File(filePath);
+    await file.writeAsBytes(response);
+
+    // Play the audio file
+    await audioPlayer.play(DeviceFileSource(filePath));
+
+    // Add the text to the chat list
+    chatList.add(Chat(message: text, isUser: true));
+    update();
+
+    // Scroll to the bottom of the chat
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (scrollController.hasClients) {
+        scrollController.animateTo(
+          scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  } catch (e) {
+    log.e("Error in Text-to-Speech: $e");
+    Fluttertoast.showToast(
+      msg: "Failed to convert text to speech!",
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.CENTER,
+      backgroundColor: ColorsConstants.blackToastColor,
+      textColor: ColorsConstants.trueWhiteColor,
+      fontSize: 12.0,
+    );
   }
+}
 }
 
 class Chat {

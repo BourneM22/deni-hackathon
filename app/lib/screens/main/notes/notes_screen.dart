@@ -1,6 +1,7 @@
 import 'package:deni_hackathon/api-response/notes_get_response.dart';
 import 'package:deni_hackathon/screens/main/notes/notes_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
 
 import '../../../constants/colors_constants.dart';
@@ -9,6 +10,7 @@ import '../../../widgets/deni_style.dart';
 /*
   Components in this file is seperated via function for better
   readability. -Derren
+  - Kaga wkwkwk, pusing gw baca nya
 */
 
 class NotesScreen extends StatelessWidget {
@@ -23,50 +25,42 @@ class NotesScreen extends StatelessWidget {
       builder: (NotesController controller) {
         return Scaffold(
           // BODY
-          body: Container(
-            color: ColorsConstants.backgroundColor,
-            child: Column(
-              children: [
-                header(),
-                main(
-                  controller.updateSearchQuery,
-                  controller.updateTagFilter,
-                  controller.noteList
-                ),
-              ],
-            ),
+          backgroundColor: ColorsConstants.backgroundColor,
+          body: Column(
+            children: [
+              header(),
+              main(
+                controller.updateSearchQuery,
+                controller.updateTagFilter,
+                controller.noteList
+              ),
+              noteView(controller.noteList),
+            ],
           ),
 
           // FLOATING ACTION BUTTON
-          floatingActionButton: Positioned(
-            bottom: 0,
-            right: 64,
-
-            child: Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFF6C2727), Color(0xFF000000)],
-                ),
+          floatingActionButton: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFF6C2727), Color(0xFF000000)],
               ),
-
-              child: FloatingActionButton(
-                onPressed: () {
-                  controller.navigateToAddNoteScreen();
-                },
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-
-                child: const Icon(
-                  Icons.add,
-                  color: ColorsConstants.trueWhiteColor,
-                ),
+            ),
+            child: FloatingActionButton(
+              onPressed: () {
+                controller.navigateToAddNoteScreen();
+              },
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              child: const Icon(
+                Icons.add,
+                color: ColorsConstants.trueWhiteColor,
               ),
             ),
           ),
+          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         );
       },
     );
@@ -106,7 +100,7 @@ class NotesScreen extends StatelessWidget {
   Widget main(
     Function updateSearchQuery,
     Function updateTagFilter,
-    List<Notes> noteList
+    List<Notes> noteList,
   ) {
     return Expanded(
       child: Container(
@@ -119,7 +113,9 @@ class NotesScreen extends StatelessWidget {
         ),
 
         child: Column(
-          children: [searchFilter(updateSearchQuery, updateTagFilter, noteList)],
+          children: [
+            searchFilter(updateSearchQuery, updateTagFilter, noteList),
+          ],
         ),
       ),
     );
@@ -129,7 +125,7 @@ class NotesScreen extends StatelessWidget {
   Widget searchFilter(
     Function updateSearchQuery,
     Function updateTagFilter,
-    List<Notes> noteList
+    List<Notes> noteList,
   ) {
     return Container(
       padding: const EdgeInsets.only(top: 12, left: 12, right: 12, bottom: 8),
@@ -232,41 +228,47 @@ class NotesScreen extends StatelessWidget {
 
   /* -------------------------------- NOTE VIEW ------------------------------- */
   Widget noteView(List<dynamic> noteList) {
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-        childAspectRatio: 3 / 2,
-      ),
+    return Container(
+      height: MediaQuery.of(Get.context!).size.height * 0.555 - 0.757,
+      color: ColorsConstants.whiteColor,
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          // childAspectRatio: 3 / 2,
+        ),
 
-      itemCount: noteList.length,
+        itemCount: noteList.length,
 
-      itemBuilder: (content, index) {
-        final note = noteList[index];
-        return Card(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  note.title ?? 'No title',
-                  style: deniStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
+        itemBuilder: (content, index) {
+          final note = noteList[index];
+          return Card(
+            color: ColorsConstants.darkerWhiteColor,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    note.title ?? 'No title',
+                    style: deniStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
 
-                const SizedBox(height: 4),
+                  const SizedBox(height: 4),
 
-                Text(
-                  note.content ?? '',
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+                  Text(
+                    note.content ?? '',
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

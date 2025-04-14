@@ -1,8 +1,10 @@
 import 'package:deni_hackathon/constants/colors_constants.dart';
 import 'package:deni_hackathon/screens/main/notes/notes_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
+import '../../../constants/assets_constants.dart';
 import '../../../widgets/deni_style.dart';
 
 class AddNoteScreen extends StatelessWidget {
@@ -15,7 +17,58 @@ class AddNoteScreen extends StatelessWidget {
       builder: (NotesController controller) {
         return Scaffold(
           backgroundColor: ColorsConstants.backgroundColor,
-
+          floatingActionButton: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            // Delete Button
+            Container(
+              margin: const EdgeInsets.only(right: 12),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: ColorsConstants.darkerPrimaryColor,
+                  width: 1,
+                ),
+              ),
+              child: FloatingActionButton(
+                onPressed: () {
+                  // controller.toggleEditMode(); // Exit edit mode
+                  Get.back(); // Close the screen
+                },
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                child: SvgPicture.asset(
+                  AssetConstants.deleteIcon,
+                  height: 24,
+                  color: ColorsConstants.darkerPrimaryColor,
+                ),
+              ),
+            ),
+            // Save Button
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xFFAB4141), Color(0xFF451B1B)],
+                ),
+              ),
+              child: FloatingActionButton(
+                onPressed: () async {
+                  await controller.onSaveNotes();
+                },
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                child: SvgPicture.asset(
+                  AssetConstants.saveIcon,
+                  height: 24,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
           // APP BAR
           appBar: AppBar(
             backgroundColor: ColorsConstants.backgroundColor,
@@ -84,6 +137,7 @@ class AddNoteScreen extends StatelessWidget {
                         ),
                   
                         child: TextFormField(
+                          controller: controller.titleTFController,
                           decoration: InputDecoration(
                             hintText: 'Enter a title...',
                             hintStyle: deniStyle(
@@ -148,6 +202,7 @@ class AddNoteScreen extends StatelessWidget {
                 // CONTENT INPUT
                 Expanded(
                   child: TextField(
+                    controller: controller.contentTFController,
                     decoration: InputDecoration(
                       hintText: 'Write your note here...',
                       hintStyle: deniStyle(

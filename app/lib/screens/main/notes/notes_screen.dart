@@ -1,3 +1,4 @@
+import 'package:deni_hackathon/api-response/notes_get_response.dart';
 import 'package:deni_hackathon/screens/main/notes/notes_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
@@ -27,7 +28,11 @@ class NotesScreen extends StatelessWidget {
             child: Column(
               children: [
                 header(),
-                main(controller.updateSearchQuery, controller.updateTagFilter),
+                main(
+                  controller.updateSearchQuery,
+                  controller.updateTagFilter,
+                  controller.noteList
+                ),
               ],
             ),
           ),
@@ -49,7 +54,6 @@ class NotesScreen extends StatelessWidget {
               ),
 
               child: FloatingActionButton(
-                // EVENT HANDLER 👈❗
                 onPressed: () {
                   controller.navigateToAddNoteScreen();
                 },
@@ -99,7 +103,11 @@ class NotesScreen extends StatelessWidget {
   }
 
   /* ---------------------------------- MAIN ---------------------------------- */
-  Widget main(Function updateSearchQuery, Function updateTagFilter) {
+  Widget main(
+    Function updateSearchQuery,
+    Function updateTagFilter,
+    List<Notes> noteList
+  ) {
     return Expanded(
       child: Container(
         decoration: BoxDecoration(
@@ -111,14 +119,18 @@ class NotesScreen extends StatelessWidget {
         ),
 
         child: Column(
-          children: [searchFilter(updateSearchQuery, updateTagFilter)],
+          children: [searchFilter(updateSearchQuery, updateTagFilter, noteList)],
         ),
       ),
     );
   }
 
   /* ------------------------------ SEARCH FILTER ----------------------------- */
-  Widget searchFilter(Function updateSearchQuery, Function updateTagFilter) {
+  Widget searchFilter(
+    Function updateSearchQuery,
+    Function updateTagFilter,
+    List<Notes> noteList
+  ) {
     return Container(
       padding: const EdgeInsets.only(top: 12, left: 12, right: 12, bottom: 8),
       decoration: BoxDecoration(
@@ -219,7 +231,42 @@ class NotesScreen extends StatelessWidget {
   }
 
   /* -------------------------------- NOTE VIEW ------------------------------- */
-  Widget noteView() {
-    return ListView();
+  Widget noteView(List<dynamic> noteList) {
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: 3 / 2,
+      ),
+
+      itemCount: noteList.length,
+
+      itemBuilder: (content, index) {
+        final note = noteList[index];
+        return Card(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  note.title ?? 'No title',
+                  style: deniStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+
+                const SizedBox(height: 4),
+
+                Text(
+                  note.content ?? '',
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }

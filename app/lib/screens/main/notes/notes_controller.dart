@@ -5,14 +5,17 @@ import 'package:get/get.dart';
 
 class NotesController extends GetxController {
   /* ------------------------------- Properties ------------------------------- */
-  String? query; // User's query
-  String? tagFilter; // Tag filter ex: (All, Important, etc)
-  List<Notes>? noteList; // Variable to store & display user's notes
+  String? query;                        // User's query
+  String? tagFilter;                    // Tag filter ex: (All, Important, etc)
+  List<Notes> noteList = List.empty();  // Variable to store & display user's notes
 
   /* --------------------------------- Methods -------------------------------- */
   @override
   void onInit() {
     super.onInit();
+
+    // Initial pull
+    getNote(tagFilter, query);
   }
 
   @override
@@ -40,7 +43,8 @@ class NotesController extends GetxController {
       tagId: tagId,
       search: searchQuery,
     );
-    noteList = temp.notes;
+
+    noteList = temp.notes ?? [];
   }
 
   /* ------------------------------- Navigation ------------------------------- */

@@ -24,44 +24,45 @@ class NotesScreen extends StatelessWidget {
           // BODY
           body: Container(
             color: ColorsConstants.backgroundColor,
-            child: Column(children: [header(), main()]),
+            child: Column(
+              children: [
+                header(),
+                main(controller.updateSearchQuery, controller.updateTagFilter),
+              ],
+            ),
           ),
 
           // FLOATING ACTION BUTTON
-          floatingActionButton:
-            Positioned(
-              bottom: 0,
-              right: 64,
+          floatingActionButton: Positioned(
+            bottom: 0,
+            right: 64,
 
-              child:
-                Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [Color(0xFF6C2727), Color(0xFF000000)],
-                    ),
-                  ),
-
-                  child:
-                    FloatingActionButton(
-                      // EVENT HANDLER 👈❗
-                      onPressed: () {
-                        controller.navigateToAddNoteScreen();
-                      },
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-
-                      child:
-                        const Icon(
-                          Icons.add,
-                          color: ColorsConstants.trueWhiteColor,
-                        ),
-                    ),
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xFF6C2727), Color(0xFF000000)],
                 ),
+              ),
+
+              child: FloatingActionButton(
+                // EVENT HANDLER 👈❗
+                onPressed: () {
+                  controller.navigateToAddNoteScreen();
+                },
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+
+                child: const Icon(
+                  Icons.add,
+                  color: ColorsConstants.trueWhiteColor,
+                ),
+              ),
             ),
+          ),
         );
       },
     );
@@ -98,7 +99,7 @@ class NotesScreen extends StatelessWidget {
   }
 
   /* ---------------------------------- MAIN ---------------------------------- */
-  Widget main() {
+  Widget main(Function updateSearchQuery, Function updateTagFilter) {
     return Expanded(
       child: Container(
         decoration: BoxDecoration(
@@ -109,13 +110,15 @@ class NotesScreen extends StatelessWidget {
           ),
         ),
 
-        child: Column(children: [searchFilter()]),
+        child: Column(
+          children: [searchFilter(updateSearchQuery, updateTagFilter)],
+        ),
       ),
     );
   }
 
   /* ------------------------------ SEARCH FILTER ----------------------------- */
-  Widget searchFilter() {
+  Widget searchFilter(Function updateSearchQuery, Function updateTagFilter) {
     return Container(
       padding: const EdgeInsets.only(top: 12, left: 12, right: 12, bottom: 8),
       decoration: BoxDecoration(
@@ -127,10 +130,15 @@ class NotesScreen extends StatelessWidget {
       child: Form(
         child: Column(
           children: [
+            // SEARCH QUERY
             Row(
               children: [
                 Expanded(
                   child: TextFormField(
+                    onChanged: (value) {
+                      updateSearchQuery(value);
+                    },
+
                     decoration: InputDecoration(
                       hintText: 'Find a note...',
                       hintStyle: deniStyle(
@@ -146,13 +154,16 @@ class NotesScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+
                 SizedBox(width: 16),
+
                 PopupMenuButton(itemBuilder: (context) => []),
               ],
             ),
 
             SizedBox(height: 12),
 
+            // TAG FILTER
             Row(
               children: [
                 Container(
@@ -192,6 +203,7 @@ class NotesScreen extends StatelessWidget {
                         ).toList(),
 
                     onChanged: (newValue) {
+                      updateTagFilter(newValue);
                       // setState(() {
                       //   selectedValue = newValue!;
                       // });
@@ -208,8 +220,6 @@ class NotesScreen extends StatelessWidget {
 
   /* -------------------------------- NOTE VIEW ------------------------------- */
   Widget noteView() {
-    return ListView(
-
-    );
+    return ListView();
   }
 }

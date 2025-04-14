@@ -1,0 +1,16 @@
+Category,Attribute,Value
+Personal,Full Name,Hans Müller
+Personal,Date of Birth,1990-05-15
+Personal,Nationality,German
+Personal,Current City,Berlin
+Professional,Occupation,Software Engineer
+Professional,Company,TechNova GmbH
+Professional,Years of Experience,10
+Education,Degree,Master's in Computer Science
+Education,University,Technical University of Munich
+Skills,Programming Languages,Python;JavaScript;Go;C++
+Skills,Frameworks,Django;React;Next.js
+Hobbies,Hobbies,Cycling;Chess;Photography
+Achievements,Awards,Best Software Developer 2022 - German Tech Awards
+Languages,Spoken Languages,German;English;Spanish
+Travel,Visited Countries,France;Japan;USA;Norway

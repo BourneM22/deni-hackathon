@@ -13,8 +13,8 @@ class APIAuth {
   // Ini localhost untuk emulator Android
   // Port 5055 adalah port yang digunakan oleh server
   // Kalo pake device lain kemungkinan harus ganti IP address ke IP address device yang dipake
-  final String baseUrl = 'http://192.168.18.10:5055/api/auth';
-  final String profileBaseUrl = 'http://192.168.18.10:5055/api';
+  final String baseUrl = 'http://192.168.18.101:5000/api/auth';
+  final String profileBaseUrl = 'http://192.168.18.101:5000/api';
 
   Future<bool> signIn(data) async {
     try {

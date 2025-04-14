@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -72,16 +73,6 @@ class HomeController extends GetxController {
   final storageStatus = await Permission.storage.request();
   await Permission.audio.request(); // Re-request permission for audio
   await Permission.manageExternalStorage.request(); // Re-request permission for audio
-  // if (storageStatus.isDenied) {
-  //   // Show a dialog or prompt to ask for permission
-  //   await _showPermissionDialog(
-  //     "Storage Permission",
-  //     "This app requires storage access to save audio files. Please grant the permission.",
-  //   );
-  //   log.d('a');
-  //   await Permission.storage.request();
-  //   log.d('z');
-  // }
 
   // Handle permanently denied permissions
   if (microphoneStatus.isPermanentlyDenied || storageStatus.isPermanentlyDenied) {
@@ -140,11 +131,11 @@ Future<void> _showPermissionDialog(String title, String message, {bool openSetti
       update();
 
       final directory = await getTemporaryDirectory();
-      recordedFilePath = '${directory.path}/recording.wav';
+      recordedFilePath = '${directory.path}/recordingAudio.aac';
 
       await recorder.startRecorder(
         toFile: recordedFilePath,
-        codec: Codec.pcm16WAV,
+        codec: Codec.aacADTS,
       );
     } catch (e) {
       log.e("Error starting recording: $e");
@@ -153,6 +144,7 @@ Future<void> _showPermissionDialog(String title, String message, {bool openSetti
 
   Future<void> onStopRecording() async {
     try {
+      // await Future.delayed(Duration(seconds: 3));
       await recorder.stopRecorder();
       isRecording = false;
       update();
@@ -174,15 +166,28 @@ Future<void> _showPermissionDialog(String title, String message, {bool openSetti
   Future<void> sendRecordingToBackend(String filePath) async {
     try {
       final file = File(filePath);
+      log.d("File path: $filePath");
+      log.d("File size: ${file.lengthSync()} bytes");
       final request = http.MultipartRequest(
         'POST',
-        Uri.parse('http://192.168.18.10:5055/api/speech/transcribe'),
+        Uri.parse('http://192.168.18.101:5000/api/speech/transcribe'),
       );
       request.files.add(await http.MultipartFile.fromPath('file', file.path));
       final response = await request.send();
 
       if (response.statusCode == 200) {
+        // Get the body of the response
+        final responseBody = await response.stream.bytesToString();
+        log.d("Response body: $responseBody");
+
+        // Handle the response as needed
+        // Push the text gotten from the server to the chat list
+        chatList.add(Chat(message: jsonDecode(responseBody)['text'], isUser: true));
         log.i("File uploaded successfully.");
+
+        // Optionally, you can delete the file after uploading
+        await file.delete();
+        update();
       } else {
         log.e("Failed to upload file. Status code: ${response.statusCode}");
       }
@@ -451,6 +456,13 @@ Future<void> _showPermissionDialog(String title, String message, {bool openSetti
     isEditMode = false;
     selectedSoundboard = null;
     update();
+  }
+
+  void onClickTextToSpeech() {
+    // Open input field dialog
+    final TextEditingController textController = TextEditingController();
+
+    
   }
 }
 

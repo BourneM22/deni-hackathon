@@ -5,7 +5,7 @@ import 'api_service.dart';
 final apiDeni = ApiDeni();
 
 class ApiDeni {
-  final baseUrl = 'http://192.168.18.10:5055/api';
+  final baseUrl = 'http://192.168.18.101:5000/api';
 
   Future<ChatbotResponse> sendToChatbot(Map<String, dynamic> data) async {
     try {

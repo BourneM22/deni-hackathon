@@ -72,7 +72,15 @@ class ApiService {
         body: json.encode(body),
       );
 
-      return response;
+      final decodedResponse = json.decode(response.body);
+
+      if (decodedResponse is Map<String, dynamic>) {
+        return decodedResponse;
+      } else if (decodedResponse is List<dynamic>) {
+        return decodedResponse;
+      } else {
+        return response;
+      }
     } catch (e) {
       throw Exception('Failed to post data: $e');
     }

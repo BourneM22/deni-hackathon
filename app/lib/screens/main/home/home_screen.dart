@@ -190,7 +190,7 @@ class HomeScreen extends StatelessWidget {
                     child: InkWell(
                       borderRadius: BorderRadius.circular(16),
                       onTap: () {
-                        print("First button clicked");
+                        controller.onClickTextToSpeech();
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(

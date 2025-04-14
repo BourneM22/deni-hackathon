@@ -1,4 +1,16 @@
+## BIO DATA TIM ##
+
+Nama Tim: JayaJayaJaya
+Anggota:
+- Derren Malaka
+- Bourne Dhiaze Jo
+- Hans Christian Arinardi
+
+=======================================================================
+
 ## DESKRIPSI PROJEK ##
+
+DENI (DEaf CompaNIon) adalah aplikasi pendamping cerdas yang dirancang khusus untuk membantu penyandang tuna rungu berkomunikasi dan beraktivitas dengan lebih mudah dan mandiri. Dengan berbagai fitur berbasis kecerdasan buatan, DENI hadir sebagai teman digital yang menjembatani kesenjangan komunikasi antara pengguna dan lingkungan sekitarnya.
 
 Proyek ini mencakup aplikasi Android yang dikembangkan menggunakan Flutter untuk front-end, yang berkomunikasi dengan Backend API berbasis .NET 9. Backend API ini terhubung dengan model AI yang dihosting menggunakan Flask untuk pemrosesan percakapan dan pertanyaan dan juga database MySQL yang sudah ada secara online. Aplikasi ini menggunakan JWT untuk autentikasi dan menyediakan layanan percakapan berbasis AI yang responsif.
 

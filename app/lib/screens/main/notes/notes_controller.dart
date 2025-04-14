@@ -1,7 +1,14 @@
+import 'package:deni_hackathon/api-response/notes_get_response.dart';
 import 'package:deni_hackathon/screens/main/notes/add_note_screen.dart';
 import 'package:get/get.dart';
 
 class NotesController extends GetxController {
+  /* ------------------------------- Properties ------------------------------- */
+  String? query;
+  String? tagFilter;
+  List<Notes>? noteList;
+
+  /* --------------------------------- Methods -------------------------------- */
   @override
   void onInit() {
     super.onInit();
@@ -12,9 +19,11 @@ class NotesController extends GetxController {
     super.dispose();
   }
 
-  void getNote() {}
+  void getNote() {
 
-  void addNewNote() {
+  }
+
+  void navigateToAddNoteScreen() {
     Get.to(() => const AddNoteScreen());
   }
 }

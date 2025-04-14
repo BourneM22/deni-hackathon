@@ -48,7 +48,7 @@ namespace api.Controllers
                     // Direct raw PCM stream
                     result = await _speechToTextService.ProcessRawAudioStream(file.OpenReadStream());
                 }
-                else if (extension == ".wav" || extension == ".mp3" || extension == ".m4a")
+                else if (extension == ".wav" || extension == ".mp3" || extension == ".m4a" || extension == ".aac")
                 {
                     // Use FFmpeg pipeline
                     result = await _speechToTextService.ProcessAudioFile(file);

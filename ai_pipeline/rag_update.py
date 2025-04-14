@@ -5,7 +5,7 @@ from langchain_core.documents import Document
 import hashlib
 import os
 
-API_URL = "http://localhost:5055/api/notes"
+API_URL = "http://localhost:5000/api/notes"
 DB_BASE_DIR = "./chrome_langchain_db"
 EMBED_MODEL = "mxbai-embed-large"
 
